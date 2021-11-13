@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root name="Choose a leader">
+    <criterion name="Goal">
+        <criterion name="Experience"/>
+        <criterion name="Education"/>
+        <criterion name="Charisma"/>
+        <criterion name="Age"/>
+    </criterion>
+    <alternatives>
+        <alternative name="Tom"/>
+        <alternative name="Dick"/>
+        <alternative name="Harry"/>
+    </alternatives>
+    <data>
+        <matrix for="Goal" width="4" height="4">
+            <value x="1" y="0">4</value>
+            <value x="2" y="0">3</value>
+            <value x="3" y="0">7</value>
+            <value x="2" y="1">-3</value>
+            <value x="3" y="1">3</value>
+            <value x="3" y="2">5</value>
+        </matrix>
+        <matrix for="Experience" width="3" height="3">
+            <value x="1" y="0">-4</value>
+            <value x="2" y="0">4</value>
+            <value x="2" y="1">9</value>
+        </matrix>
+        <matrix for="Education" width="3" height="3">
+            <value x="1" y="0">3</value>
+            <value x="2" y="0">-5</value>
+            <value x="2" y="1">-7</value>
+        </matrix>
+        <matrix for="Charisma" width="3" height="3">
+            <value x="1" y="0">5</value>
+            <value x="2" y="0">9</value>
+            <value x="2" y="1">4</value>
+        </matrix>
+        <matrix for="Age" width="3" height="3">
+            <value x="1" y="0">-3</value>
+            <value x="2" y="0">5</value>
+            <value x="2" y="1">9</value>
+        </matrix>
+    </data>
+</root>
