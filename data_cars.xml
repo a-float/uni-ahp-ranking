@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <criterion name="Goal" goal="Choose the best car for the Jones family">
+        <criterion name="Cost">
+            <criterion name="Purchase price"/>
+            <criterion name="Fuel cost"/>
+            <criterion name="Maintenance Cost"/>
+            <criterion name="Resale value"/>
+        </criterion>
+        <criterion name="Safety"/>
+        <criterion name="Style"/>
+        <criterion name="Capacity">
+            <criterion name="Cargo capacity"/>
+            <criterion name="Passenger capacity"/>
+        </criterion>
+    </criterion>
+    <alternatives>
+        <alternative name="Accord Sedan"/>
+        <alternative name="Accord Hybrid"/>
+        <alternative name="Pilot SUV"/>
+        <alternative name="CR-V SUV"/>
+        <alternative name="Element SUV"/>
+        <alternative name="Odyssey Minivan"/>
+    </alternatives>
+    <data>
+        <matrix for="Goal" width="4" height="4">
+            <value x="1" y="0">3</value>
+            <value x="2" y="0">7</value>
+            <value x="3" y="0">3</value>
+            <value x="2" y="1">9</value>
+            <value x="3" y="1">1</value>
+            <value x="3" y="2">-7</value>
+        </matrix>
+    </data>
+</root>
