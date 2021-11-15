@@ -1,5 +1,4 @@
 from tabulate import tabulate
-
 from AHP import AHP
 
 
@@ -23,6 +22,7 @@ class CLI:
         self.ahp = None
         self.selected_criterion = None
         self.done = False
+        self.doesnt_need_ahp = ['help', 'exit', 'load']
 
         self.actions = {
             'load': self.on_load,
@@ -103,6 +103,9 @@ class CLI:
             while not comm:
                 comm = input('>').split()
             if comm[0] in self.actions.keys():
+                if self.ahp is None and comm[0] not in self.doesnt_need_ahp:
+                    print("No ahp loaded. Use load command first.")
+                    continue
                 try:
                     self.actions[comm[0]](comm)
                 except (AssertionError, ValueError) as e:

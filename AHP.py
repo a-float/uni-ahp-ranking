@@ -1,10 +1,9 @@
 import xml.etree.ElementTree as ET
-
 import numpy as np
 
 
 class AHP:
-    """ acts as an interface for interacting with the AHP tree"""
+    """ acts as an interface for interacting with the AHP tree """
 
     def __init__(self, filename):
         try:
@@ -50,7 +49,7 @@ def calculate_weights(matrix):
 
 
 class Node:
-    """ parent class for AHP tree nodes"""
+    """ parent class for AHP tree nodes """
 
     def __init__(self, node):
         self.name = node.get('name')
@@ -59,7 +58,7 @@ class Node:
 
 
 class Alternative(Node):
-    """ represents an alternative node - basically a name holder atm"""
+    """ represents an alternative node - basically a name holder atm """
 
     def __init__(self, node, parent_criterion):
         super().__init__(node)
@@ -120,7 +119,7 @@ class Criterion(Node):
         return self.get_scores_for(list(range(alt_count)))
 
     def get_scores_for(self, indices):
-        """ performs the AHP scores calculation with respect to the self criterion"""
+        """ performs the AHP scores calculation with respect to the self criterion """
         names = None
         if self.is_final_criterion:
             res = np.array([alt.weight for alt in self.children])[indices]
@@ -139,11 +138,10 @@ class Criterion(Node):
         self.update_weights()
 
     def input_matrix(self):
-        """ reads the new decision matrix values from the user via the command line"""
+        """ reads the new decision matrix values from the user via the command line """
         child_count = len(self.children)
         for i in range(0, child_count):
             for j in range(i + 1, child_count):
-                print(i, j)
                 msg = f"How do you compare {self.children[i].name} to {self.children[j].name} with respect to {self.name}?"
                 msg += f"\n(Previously {self.matrix[i][j]})\n> "
                 while True:
@@ -162,7 +160,7 @@ class Criterion(Node):
         print(f"Weights for criterion {self.name} has been set")
 
     def load_matrix(self, root):
-        """ returns a matrix for the criterion name read from the xml file, returns None if the matrix doesn't exist"""
+        """ returns a matrix for the criterion name read from the xml file, returns None if the matrix doesn't exist """
         matrix_node = root.find(f'.//matrix[@for="{self.name}"]')
         if matrix_node is None:
             return None
@@ -178,7 +176,7 @@ class Criterion(Node):
         return matrix
 
     def find_criterion(self, name):
-        """ recursively searches for the criterion with the specified name among it's children"""
+        """ recursively searches for the criterion with the specified name among it's children """
         if self.name == name:
             return self
         if not self.children or self.is_final_criterion:
