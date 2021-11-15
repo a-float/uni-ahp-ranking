@@ -1,21 +1,38 @@
 # uni-ahp-ranking
 
-data.xml represents data necessary to calculate the AHP ranking.
-
-No additional python requirements atm
-
-Usage:
+A simple cli program for managing an AHP process laoded from an xml file with a following structure:
 ```
-root = ET.parse('data.xml').getroot()
-# AHP creates a tree of criteria, loads up the decision matrices and set's up waights based on them
-ahp = AHP(root)
-# returns a list of scores for alternatives at the specified indices (ordering identical to the one in the xml file)
-print(ahp.get_scores_for([0, 1, 2]))
+<root>
+    <criterion name="Goal" goal="Choose a leader">
+        <criterion name="Experience"/>
+        <criterion name="Education"> 
+          <!-- criteria can be nested -->
+          <criterion name="Practical knowledge/>
+          <criterion name="Practical knowledge/>
+        </criterion>
+        <criterion name="Charisma"/>
+        <criterion name="Age"/>
+    </criterion>
+    <alternatives>
+        <!-- every alternatives is considered with respect to criteria with no subcriteria-->
+        <alternative name="Tom"/>
+        <alternative name="Dick"/>
+        <alternative name="Harry"/>
+    </alternatives>
+    <data>
+    <!-- optional matrices data -->
+    </data>
+</root>
 ```
 
-Returns:
+### Usage
 ```
-{'Tom': 0.35813676942236533, 'Dick': 0.49278818823437454, 'Harry': 0.14907504234326027}
+pip install -r requirements.txt
+python ahp_cli.py
 ```
 
-Example data taken from Wikipedia: https://en.wikipedia.org/wiki/Analytic_hierarchy_process_%E2%80%93_leader_example
+To view available commands use `help`
+
+Example data taken from Wikipedia: 
+- [Choosing a leader](https://en.wikipedia.org/wiki/Analytic_hierarchy_process_%E2%80%93_leader_example)
+- [Choosing a car](https://en.wikipedia.org/wiki/Analytic_hierarchy_process_%E2%80%93_car_example)
