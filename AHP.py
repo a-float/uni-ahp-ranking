@@ -147,7 +147,7 @@ class Criterion(Node):
                 while True:
                     try:
                         value = float(input(msg))
-                        assert 0 < abs(value) < 9, "Number out of range (-9, 0) u (0, 9)"
+                        assert 0 < abs(value) <= 9, "Number out of range [-9, 0) u (0, 9]"
                         if value < 0:
                             value = (1 / -value)
                         self.matrix[i][j] = value
@@ -165,6 +165,9 @@ class Criterion(Node):
         if matrix_node is None:
             return None
         y, x = list(map(int, [matrix_node.get('height'), matrix_node.get('width')]))
+        if x != y or x != len(self.children):
+            print(f"Invalid matrix data for {self.name}")
+            return None
         matrix = np.ones((y, x), dtype=np.float64)
         for value in matrix_node:
             x, y = list(map(int, [value.get('x'), value.get('y')]))
