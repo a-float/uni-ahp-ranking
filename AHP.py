@@ -166,13 +166,16 @@ class Criterion(Node):
             return None
         y, x = list(map(int, [matrix_node.get('height'), matrix_node.get('width')]))
         if x != y or x != len(self.children):
-            print(f"Invalid matrix data for {self.name}")
+            print(f"Invalid matrix size for {self.name}")
             return None
         matrix = np.ones((y, x), dtype=np.float64)
         for value in matrix_node:
             x, y = list(map(int, [value.get('x'), value.get('y')]))
             val = float(value.text)
             val = -(1 / val) if val < 0 else val
+            if x < 0 or x > len(self.children) or y < 0 or y > len(self.children):
+                print(f"Invalid attributes for value: <value x='{x}' y='{y}'>{value.text}</value> in matrix for {self.name}")
+                return None
             matrix[y, x] = val
             matrix[x, y] = 1 / val
         print(f"# Loaded matrix for {self.name}")

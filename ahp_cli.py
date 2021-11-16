@@ -6,7 +6,7 @@ def on_help(comm):
     help_msg = [["load [filename]", "creates a new AHP object from xml file and selects it's root"],
                 ["show", "displays current AHP status and the selected criterion"],
                 ["select [criterion name]", "select criterion with specified name or None if it doesn't exist"],
-                ["score ['all' | indices] sort?", "display chosen alternatives' scores at selected criterion"],
+                ["scores ['all' | indices] sort?", "display chosen alternatives' scores at selected criterion"],
                 ["change-matrix", "manually change matrix values at the selected criterion"],
                 ["show-matrix", "display selected criterion's matrix"],
                 ["reset-matrix", "set selected criterion's matrix to an identity matrix"],
