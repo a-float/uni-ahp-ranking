@@ -1,6 +1,6 @@
 # uni-ahp-ranking
 
-A simple cli program for managing an AHP process laoded from an xml file with a following structure:
+A simple cli program for managing an AHP process loaded from an xml file with a following structure:
 ```
 <root>
     <criterion name="Goal" goal="Choose a leader">
