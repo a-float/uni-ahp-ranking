@@ -8,7 +8,7 @@ A simple cli program for managing an AHP process loaded from an xml file with a 
         <criterion name="Education"> 
           <!-- criteria can be nested -->
           <criterion name="Practical knowledge/>
-          <criterion name="Practical knowledge/>
+          <criterion name="Theoretical knowledge/>
         </criterion>
         <criterion name="Charisma"/>
         <criterion name="Age"/>

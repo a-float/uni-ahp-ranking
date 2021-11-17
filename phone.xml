@@ -1,0 +1,261 @@
+<root>
+	<criterion name="Goal" goal="Choose a phone">
+		<criterion name="Display">
+			<criterion name="Size" />
+			<criterion name="Quality" />
+		</criterion>
+		<criterion name="Price">
+			<criterion name="Purchase price" />
+			<criterion name="Resell price" />
+		</criterion>
+		<criterion name="Components">
+			<criterion name="CPU" />
+			<criterion name="Storage" />
+		</criterion>
+		<criterion name="Style">
+			<criterion name="Camera" />
+			<criterion name="Weight" />
+			<criterion name="Feel" />
+		</criterion>
+	</criterion>
+	<alternatives>
+		<alternative name="IPhone 13" />
+		<alternative name="Samsung Galaxy S21" />
+		<alternative name="Redmi 10" />
+		<alternative name="OnePlus 9R" />
+		<alternative name="Xiaomi Poco X3Pro" />
+		<alternative name="IPhone 12" />
+		<alternative name="Oppo Reno 6" />
+	</alternatives>
+	<data>
+		<matrix for="Goal" width="4" height="4">
+			<value x="0" y="1">0.2</value>
+			<value x="0" y="2">0.125</value>
+			<value x="0" y="3">1.0</value>
+			<value x="1" y="2">3.0</value>
+			<value x="1" y="3">1.0</value>
+			<value x="2" y="3">2.0</value>
+		</matrix>
+		<matrix for="Display" width="2" height="2">
+			<value x="0" y="1">3.0</value>
+		</matrix>
+		<matrix for="Size" width="7" height="7">
+			<value x="0" y="1">4.0</value>
+			<value x="0" y="2">2.0</value>
+			<value x="0" y="3">1.0</value>
+			<value x="0" y="4">3.0</value>
+			<value x="0" y="5">4.0</value>
+			<value x="0" y="6">5.0</value>
+			<value x="1" y="2">0.5</value>
+			<value x="1" y="3">1.0</value>
+			<value x="1" y="4">0.25</value>
+			<value x="1" y="5">0.3333333333333333</value>
+			<value x="1" y="6">0.16666666666666666</value>
+			<value x="2" y="3">0.3333333333333333</value>
+			<value x="2" y="4">0.5</value>
+			<value x="2" y="5">1.0</value>
+			<value x="2" y="6">0.2</value>
+			<value x="3" y="4">5.0</value>
+			<value x="3" y="5">4.0</value>
+			<value x="3" y="6">3.0</value>
+			<value x="4" y="5">2.0</value>
+			<value x="4" y="6">5.0</value>
+			<value x="5" y="6">2.0</value>
+		</matrix>
+		<matrix for="Quality" width="7" height="7">
+			<value x="0" y="1">4.0</value>
+			<value x="0" y="2">2.0</value>
+			<value x="0" y="3">3.0</value>
+			<value x="0" y="4">0.5</value>
+			<value x="0" y="5">4.0</value>
+			<value x="0" y="6">2.0</value>
+			<value x="1" y="2">3.0</value>
+			<value x="1" y="3">4.0</value>
+			<value x="1" y="4">0.2</value>
+			<value x="1" y="5">2.0</value>
+			<value x="1" y="6">0.5</value>
+			<value x="2" y="3">4.0</value>
+			<value x="2" y="4">3.0</value>
+			<value x="2" y="5">4.0</value>
+			<value x="2" y="6">0.3333333333333333</value>
+			<value x="3" y="4">2.0</value>
+			<value x="3" y="5">1.0</value>
+			<value x="3" y="6">2.0</value>
+			<value x="4" y="5">3.0</value>
+			<value x="4" y="6">4.0</value>
+			<value x="5" y="6">2.0</value>
+		</matrix>
+		<matrix for="Price" width="2" height="2">
+			<value x="0" y="1">4.0</value>
+		</matrix>
+		<matrix for="Purchase price" width="7" height="7">
+			<value x="0" y="1">3.0</value>
+			<value x="0" y="2">4.0</value>
+			<value x="0" y="3">2.0</value>
+			<value x="0" y="4">3.0</value>
+			<value x="0" y="5">0.25</value>
+			<value x="0" y="6">0.14285714285714285</value>
+			<value x="1" y="2">0.125</value>
+			<value x="1" y="3">2.0</value>
+			<value x="1" y="4">3.0</value>
+			<value x="1" y="5">4.0</value>
+			<value x="1" y="6">1.0</value>
+			<value x="2" y="3">4.0</value>
+			<value x="2" y="4">4.0</value>
+			<value x="2" y="5">2.0</value>
+			<value x="2" y="6">1.0</value>
+			<value x="3" y="4">1.0</value>
+			<value x="3" y="5">3.0</value>
+			<value x="3" y="6">0.25</value>
+			<value x="4" y="5">2.0</value>
+			<value x="4" y="6">1.0</value>
+			<value x="5" y="6">6.0</value>
+		</matrix>
+		<matrix for="Resell price" width="7" height="7">
+			<value x="0" y="1">4.0</value>
+			<value x="0" y="2">2.0</value>
+			<value x="0" y="3">4.0</value>
+			<value x="0" y="4">5.0</value>
+			<value x="0" y="5">6.0</value>
+			<value x="0" y="6">7.0</value>
+			<value x="1" y="2">3.0</value>
+			<value x="1" y="3">2.0</value>
+			<value x="1" y="4">1.0</value>
+			<value x="1" y="5">5.0</value>
+			<value x="1" y="6">4.0</value>
+			<value x="2" y="3">3.0</value>
+			<value x="2" y="4">2.0</value>
+			<value x="2" y="5">1.0</value>
+			<value x="2" y="6">7.0</value>
+			<value x="3" y="4">3.0</value>
+			<value x="3" y="5">2.0</value>
+			<value x="3" y="6">1.0</value>
+			<value x="4" y="5">5.0</value>
+			<value x="4" y="6">6.0</value>
+			<value x="5" y="6">6.0</value>
+		</matrix>
+		<matrix for="Components" width="2" height="2">
+			<value x="0" y="1">4.0</value>
+		</matrix>
+		<matrix for="CPU" width="7" height="7">
+			<value x="0" y="1">4.0</value>
+			<value x="0" y="2">5.0</value>
+			<value x="0" y="3">4.0</value>
+			<value x="0" y="4">3.0</value>
+			<value x="0" y="5">2.0</value>
+			<value x="0" y="6">0.5</value>
+			<value x="1" y="2">0.3333333333333333</value>
+			<value x="1" y="3">0.2</value>
+			<value x="1" y="4">3.0</value>
+			<value x="1" y="5">4.0</value>
+			<value x="1" y="6">8.0</value>
+			<value x="2" y="3">0.3333333333333333</value>
+			<value x="2" y="4">5.0</value>
+			<value x="2" y="5">4.0</value>
+			<value x="2" y="6">3.0</value>
+			<value x="3" y="4">2.0</value>
+			<value x="3" y="5">1.0</value>
+			<value x="3" y="6">4.0</value>
+			<value x="4" y="5">0.16666666666666666</value>
+			<value x="4" y="6">4.0</value>
+			<value x="5" y="6">3.0</value>
+		</matrix>
+		<matrix for="Storage" width="7" height="7">
+			<value x="0" y="1">4.0</value>
+			<value x="0" y="2">2.0</value>
+			<value x="0" y="3">4.0</value>
+			<value x="0" y="4">3.0</value>
+			<value x="0" y="5">2.0</value>
+			<value x="0" y="6">0.25</value>
+			<value x="1" y="2">5.0</value>
+			<value x="1" y="3">0.5</value>
+			<value x="1" y="4">0.14285714285714285</value>
+			<value x="1" y="5">2.0</value>
+			<value x="1" y="6">3.0</value>
+			<value x="2" y="3">5.0</value>
+			<value x="2" y="4">6.0</value>
+			<value x="2" y="5">7.0</value>
+			<value x="2" y="6">0.5</value>
+			<value x="3" y="4">0.3333333333333333</value>
+			<value x="3" y="5">5.0</value>
+			<value x="3" y="6">4.0</value>
+			<value x="4" y="5">3.0</value>
+			<value x="4" y="6">2.0</value>
+			<value x="5" y="6">6.0</value>
+		</matrix>
+		<matrix for="Style" width="3" height="3">
+			<value x="0" y="1">3.0</value>
+			<value x="0" y="2">2.0</value>
+			<value x="1" y="2">1.0</value>
+		</matrix>
+		<matrix for="Camera" width="7" height="7">
+			<value x="0" y="1">3.0</value>
+			<value x="0" y="2">6.0</value>
+			<value x="0" y="3">4.0</value>
+			<value x="0" y="4">3.0</value>
+			<value x="0" y="5">2.0</value>
+			<value x="0" y="6">5.0</value>
+			<value x="1" y="2">7.0</value>
+			<value x="1" y="3">2.0</value>
+			<value x="1" y="4">1.0</value>
+			<value x="1" y="5">4.0</value>
+			<value x="1" y="6">5.0</value>
+			<value x="2" y="3">6.0</value>
+			<value x="2" y="4">0.125</value>
+			<value x="2" y="5">2.0</value>
+			<value x="2" y="6">3.0</value>
+			<value x="3" y="4">4.0</value>
+			<value x="3" y="5">6.0</value>
+			<value x="3" y="6">1.0</value>
+			<value x="4" y="5">0.3333333333333333</value>
+			<value x="4" y="6">0.2</value>
+			<value x="5" y="6">4.0</value>
+		</matrix>
+		<matrix for="Weight" width="7" height="7">
+			<value x="0" y="1">2.0</value>
+			<value x="0" y="2">4.0</value>
+			<value x="0" y="3">3.0</value>
+			<value x="0" y="4">2.0</value>
+			<value x="0" y="5">1.0</value>
+			<value x="0" y="6">0.2</value>
+			<value x="1" y="2">3.0</value>
+			<value x="1" y="3">4.0</value>
+			<value x="1" y="4">5.0</value>
+			<value x="1" y="5">8.0</value>
+			<value x="1" y="6">0.5</value>
+			<value x="2" y="3">1.0</value>
+			<value x="2" y="4">3.0</value>
+			<value x="2" y="5">4.0</value>
+			<value x="2" y="6">5.0</value>
+			<value x="3" y="4">6.0</value>
+			<value x="3" y="5">0.125</value>
+			<value x="3" y="6">2.0</value>
+			<value x="4" y="5">3.0</value>
+			<value x="4" y="6">5.0</value>
+			<value x="5" y="6">6.0</value>
+		</matrix>
+		<matrix for="Feel" width="7" height="7">
+			<value x="0" y="1">4.0</value>
+			<value x="0" y="2">5.0</value>
+			<value x="0" y="3">3.0</value>
+			<value x="0" y="4">2.0</value>
+			<value x="0" y="5">0.2</value>
+			<value x="0" y="6">4.0</value>
+			<value x="1" y="2">2.0</value>
+			<value x="1" y="3">3.0</value>
+			<value x="1" y="4">4.0</value>
+			<value x="1" y="5">6.0</value>
+			<value x="1" y="6">0.125</value>
+			<value x="2" y="3">2.0</value>
+			<value x="2" y="4">3.0</value>
+			<value x="2" y="5">5.0</value>
+			<value x="2" y="6">6.0</value>
+			<value x="3" y="4">8.0</value>
+			<value x="3" y="5">4.0</value>
+			<value x="3" y="6">3.0</value>
+			<value x="4" y="5">2.0</value>
+			<value x="4" y="6">1.0</value>
+			<value x="5" y="6">3.0</value>
+		</matrix>
+	</data>
+</root>
