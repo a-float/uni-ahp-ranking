@@ -201,8 +201,8 @@ class Criterion(Node):
         for i in range(0, y - 1):
             for j in range(i + 1, x):
                 value = ET.SubElement(new_matrix, 'value')
-                value.set('x', str(i))
-                value.set('y', str(j))
+                value.set('x', str(j))
+                value.set('y', str(i))
                 value.text = str(self.matrix[i, j])
 
     def save_decision_matrix(self, data_node):
