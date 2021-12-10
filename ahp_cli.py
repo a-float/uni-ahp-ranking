@@ -116,10 +116,3 @@ class CLI:
                 print("Unknown command")
 
 
-def main():
-    cli = CLI()
-    cli.loop()
-
-
-if __name__ == '__main__':
-    main()
