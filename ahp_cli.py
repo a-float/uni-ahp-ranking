@@ -1,5 +1,6 @@
 from tabulate import tabulate
 from AHP import AHP
+from Criterion import Criterion
 
 
 def on_help(comm):
@@ -11,9 +12,15 @@ def on_help(comm):
                 ["show-matrix", "display selected criterion's matrix"],
                 ["reset-matrix", "set selected criterion's matrix to an identity matrix"],
                 ["save [filename]", "save the model with decision weights to the specified file"],
+                ["ic", "calculate inconsistancy"],
+                ["load-additional [filename]", "loads additional matrix from other expert"],
+                ["select-multiple [criterion name1] [criterion name2] ...", "multiple level criteria selection"],
                 ["exit", "quit the program"]]
     print(tabulate(help_msg, headers=["Command", "Description"], tablefmt='simple'))
 
+
+EVM = "EVM"
+GMM = "GMM"
 
 class CLI:
     """ handles the manin input loop, parses and executes commands """
@@ -21,9 +28,9 @@ class CLI:
     def __init__(self):
         self.ahp = None
         self.selected_criterion = None
+        self.selected_multiple_criterion = []
         self.done = False
         self.doesnt_need_ahp = ['help', 'exit', 'load']
-
         self.actions = {
             'load': self.on_load,
             'show': self.on_show,
@@ -33,8 +40,28 @@ class CLI:
             'show-matrix': self.on_show_matrix,
             'reset-matrix': self.on_reset_matrix,
             'save': self.on_save,
+            'ic':self.on_ic,
+            'load-additional':self.load_additional,
+            'select-multiple':self.select_multiple,
             'help': on_help,
         }
+
+    def select_multiple(self, comm):
+        assert len(comm) > 2, "No filenames specified"
+        n = len(comm)
+        for i in range(1, n):
+            name = comm[i]   # UWAGA <= kryterium musi byc jednoczlonowe
+            print(name)
+            self.selected_multiple_criterion.append(self.ahp.find_criterion(name))
+            print(f"Selected criterion: {self.selected_multiple_criterion[i-1]}")
+
+    def load_additional(self, comm):
+        assert len(comm) == 2, "No filename specified"
+        self.selected_criterion.load_additional(comm[1])
+
+    def on_ic(self, comm):
+        assert len(comm) == 1, "No need for extra arguments"
+        self.selected_criterion.ic()
 
     def on_load(self, comm):
         assert len(comm) == 2, "No filename specified"
@@ -48,7 +75,8 @@ class CLI:
 
     def on_select(self, comm):
         assert len(comm) > 1, "No criterion name specified"
-        name = ' '.join(comm[1:])
+        name = ' '.join(comm[1:])   # bierze elementy listy i łaczy je za pomocą spaji 
+        print(name)
         self.selected_criterion = self.ahp.find_criterion(name)
         print(f"Selected criterion: {self.selected_criterion}")
 
@@ -57,6 +85,22 @@ class CLI:
             assert len(comm) > 1, "No option specified"
             if comm[1] == 'all':
                 scores, names = self.selected_criterion.get_all_scores()
+            elif comm[1] == 'multiple':
+                if self.selected_multiple_criterion == []:
+                    print("no multiple criteria selected")
+                    return
+                else:
+                    scores_tab = []
+                    for cirterion in self.selected_multiple_criterion:
+                        scores, names = cirterion.get_all_scores()
+                        scores_tab.append(scores)
+                    res = [0] * len(scores_tab[0])
+                    for i in range(0, len(scores_tab[0])):
+                        sm = 0
+                        for j in range(0, len(scores_tab)):
+                            sm += scores_tab[j][i]
+                        res[i] = sm/len(scores_tab)
+                    scores = res
             else:
                 indices = list(map(int, comm[1:]))
                 scores, names = self.selected_criterion.get_scores_for(indices)
@@ -65,7 +109,7 @@ class CLI:
                 res = sorted(res, reverse=True, key=lambda x: x[1])
             print('\n'.join([f"{item[0]}: {round(item[1], 3)}" for item in res]))
         except IndexError as e:
-            raise ValueError("Expected 'score [all | indices] " + str(e))
+            raise ValueError("Expected 'score [all | indices | multiple] " + str(e))
 
     def on_change_matrix(self, comm):
         assert len(comm) == 1, "No arguments required"

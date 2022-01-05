@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import numpy as np
-from Criterion import Criterion, calculate_weights
+from Criterion import Criterion
 
 class AHP:
     """ acts as an interface for interacting with the AHP tree """
@@ -16,14 +16,7 @@ class AHP:
         self.root_criterion = Criterion(root.find('./criterion'), root)
         for alt_node in root.find('alternatives'):
             self.alternatives.append(alt_node.get('name'))
-
-    # not necessary rn
-    # def get_all_scores(self):
-    #     return self.root_criterion.get_all_scores()
-    #
-    # def get_scores_for(self, indices):
-    #     return self.root_criterion.get_scores_for(indices)
-
+            
     def save_decisions(self, filename):
         self.root_criterion.save_decision_matrix(self.tree.find('data'))
         ET.indent(self.tree, space="\t", level=0)
