@@ -1,7 +1,7 @@
 class Node:
     """ parent class for AHP tree nodes """
 
-    def __init__(self, node):           # node to słownik ???
+    def __init__(self, node):           
         self.name = node.get('name')    # .get("key") -> value
         self.children = []              
         self.weight = 1
