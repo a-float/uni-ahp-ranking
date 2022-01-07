@@ -1,0 +1,42 @@
+<root>
+	<criterion name="Goal" goal="Choose a goose" />
+	<alternatives>
+		<alternative name="John" />
+		<alternative name="Wick" />
+		<alternative name="Tyler" />
+		<alternative name="Hero" />
+		<alternative name="Beck" />
+        <alternative name="Adam" />
+		<alternative name="Kowalski" />
+	</alternatives>
+	<data>
+		<matrix for="Goal" width="7" height="7">
+			<value x="0" y="1">7</value>
+			<value x="0" y="2">2</value>
+			<value x="0" y="3">4</value>
+			<value x="0" y="4">3</value>
+            <value x="0" y="5">0.16</value>
+			<value x="0" y="6">2</value>
+
+			<value x="1" y="2">0.33</value>
+			<value x="1" y="3">5</value>
+			<value x="1" y="4">0.2</value>
+            <value x="1" y="5">0.14</value>
+			<value x="1" y="6">5</value>
+
+			<value x="2" y="3">6</value>
+			<value x="2" y="4">3</value>
+            <value x="2" y="5">2</value>
+			<value x="2" y="6">8</value>
+
+			<value x="3" y="4">8</value>
+            <value x="3" y="5">0.2</value>
+            <value x="3" y="6">8</value>
+            
+            <value x="4" y="5">0.11</value>
+            <value x="4" y="6">2</value>
+            
+            <value x="5" y="6">2</value>
+		</matrix>
+	</data>
+</root>
