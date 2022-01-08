@@ -5,12 +5,13 @@ from Alternative import Alternative
 import xml.etree.ElementTree as ET
 import numpy as np
 import math
-import tabulate
+import logging
 
 EVM = "EVM"
 GMM = "GMM"
 complete_methods = [EVM, GMM]
 incomplete_methods = ["SCI", "GW", "SH"]
+log = logging.getLogger('mylogger')
 
 
 class Criterion(Node):
@@ -41,7 +42,7 @@ class Criterion(Node):
 
         # set the children weights
         self.update_weights()
-        print(f"Created criterion {self.name}")
+        log.info(f"Created criterion {self.name}")
 
     def is_complete(self):
         """returns true if at all the sub matrices are complete and false otherwise """
@@ -96,9 +97,8 @@ class Criterion(Node):
         self.matrices_completion[idx] = is_complete
         # always aggregate after setting is_aggregated to False
         # a bit slower, but the aggregated matrix is always updated
-        # usedfull for the GUI
-        print(f"Matrix {idx} has been set")
-        print(new_matrix)
+        # mainly ull for the GUI
+        log.info(f"Matrix {idx + 1} set")
         self.is_aggregated = False
         self.aggregate()
 
@@ -107,15 +107,17 @@ class Criterion(Node):
         self.update_weights()
         self.is_aggregated = False
         self.aggregate()
+        log.info(f"# Matrix {idx} reset")
 
     def remove_matrix(self, idx):
         try:
-            del self.matrices[idx]
             del self.matrices_completion[idx]
+            del self.matrices[idx]
             self.is_aggregated = False
             self.aggregate()
-        except Exception:
-            print("Invalid index")
+        except Exception as e:
+            print(e)
+            log.error("Invalid remove_matrix index")
 
     def _input_matrix(self):
         """ reads the new decision matrix values from the user via the command line """
@@ -150,23 +152,23 @@ class Criterion(Node):
         """Add the given matrix to the matrices list. Assumes the matrix does not contain negative values"""
         if new_matrix.shape != self.matrix.shape:
             pretty_matrix = str(new_matrix).replace('[', '').replace(']', '')
-            print(f"Matrix:\n{pretty_matrix}\nis of invalid shape. Skipping")
+            log.error(f"Matrix:\n{pretty_matrix}\nis of invalid shape. Skipping")
             return
         self.matrices.append(new_matrix)
         self.matrices_completion.append(complete)
         self.is_aggregated = False
         self.update_weights()
-        print(f"# Loaded matrix for {self.name}")
+        log.info(f"# Added matrix for {self.name}")
 
     # Aggregated matrix is the geometric average of all sub matrices
     def aggregate(self):
-        print("# Aggregating")
+        log.debug("# Aggregating")
         self.matrix = np.ones(self.matrix.shape)
-        for sub_matrix in self.matrices:
-            self.matrix *= sub_matrix
-
-        r = len(self.matrices)
-        self.matrix **= (1 / r)
+        if self.matrices:
+            for sub_matrix in self.matrices:
+                self.matrix *= sub_matrix
+            r = len(self.matrices)
+            self.matrix **= (1 / r)
         self.is_aggregated = True
 
     def load_all_matrices(self, root):
@@ -181,7 +183,7 @@ class Criterion(Node):
             return None
         y, x = list(map(int, [matrix_node.get('height'), matrix_node.get('width')]))
         if x != y or x != len(self.children):
-            print(f"Invalid matrix size for {self.name}")
+            log.error(f"Invalid matrix size for {self.name}")
             return None
         matrix = np.zeros((y, x), dtype=np.float64)
         np.fill_diagonal(matrix, 1)
@@ -192,12 +194,12 @@ class Criterion(Node):
             try:
                 val = float(value.text)
             except ValueError:
-                print(
+                log.error(
                     f"Invalid value at: <value x='{x}' y='{y}'>{value.text}</value> in matrix for {self.name}")
                 return None, None
             # check if the x and y attributes are valid
             if x < 0 or x > len(self.children) or y < 0 or y > len(self.children):
-                print(
+                log.error(
                     f"Invalid attributes for value: <value x='{x}' y='{y}'>{value.text}</value> in matrix for {self.name}")
                 return None, None
             # transform value into positive inverse if it's negative
@@ -261,7 +263,7 @@ class Criterion(Node):
         """są dwie metody dla macierzy kompletnych i jedna dla niekompletnych"""
         CI = None
         if self.is_complete():
-            print("# Calculating inconsistency for a complete matrix")
+            log.info("# Calculating inconsistency for a complete matrix")
             # method = input("METHOD = [SCI or GW] ")
             if method == "SCI":
                 # Saaty's consistency index
@@ -269,7 +271,7 @@ class Criterion(Node):
                 lambda_max = np.amax(eigenvalues)
                 n = len(self.matrix)
                 CI = (lambda_max - n) / (n - 1)
-                # print("Inconsistency = " + str(CI))
+                # log.info("Inconsistency = " + str(CI))
             elif method == "GW":
                 # Golden Wang index
                 n = len(self.matrix)
@@ -294,10 +296,10 @@ class Criterion(Node):
                     for j in range(n):
                         smm += abs(_C[i][j] - wgm[i])
                 CI = 1 / n * smm
-                # print("Inconsistency = " + str(CI))
+                # log.info("Inconsistency = " + str(CI))
         else:
-            print("# Calculating inconsistency for an incomplete matrix")
-            print("# Using the Saaty-Harker method")
+            log.info("# Calculating inconsistency for an incomplete matrix")
+            log.info("# Using the Saaty-Harker method")
             method = "SH"
             if method == "SH":
                 # Saaty-Harker
@@ -322,13 +324,13 @@ class Criterion(Node):
                 eigenvalues, eigenvector = map(np.real, np.linalg.eig(B))
                 max_arg = np.amax(eigenvalues)
                 CI = max_arg - n / (n - 1)
-                # print("Inconsistency = " + str(CI))
+                # log.info("Inconsistency = " + str(CI))
 
         if CI is not None and 3 <= n <= 20:
-            # print("Consistency Ratio = " + str(CI / RI.get(n)))
+            # log.info("Consistency Ratio = " + str(CI / RI.get(n)))
             return CI, CI / RI.get(n)
         else:
-            print("Invalid parameters. CI is None or n < 3 and n > 20\n")
+            log.error("Invalid parameters. CI is None or n < 3 and n > 20\n")
             return None, None
 
     def wgmu(self, i, n):

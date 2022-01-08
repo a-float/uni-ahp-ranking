@@ -11,6 +11,7 @@ class AHP:
             root = self.tree.getroot()
         except (FileNotFoundError, ET.ParseError) as e:
             raise ValueError("Exception while creating AHP object:" + str(e))
+        self.filename = filename
         self.alternatives = []
         # the actual root of the tree
         self.root_criterion = Criterion(root.find('./criterion'), root)

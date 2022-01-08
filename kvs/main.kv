@@ -2,28 +2,32 @@
 
 <CriterionSelect>:
     orientation: 'vertical'
-    size_hint_x: 0.7
     # tree view generated in the py file
 
 <MatrixInput>:
     multiline: False
-    halign: "center"
+    halign: "left"
     background_color: .7, .7, .7, .4
     foreground_color: .9, .9, .9, 1
     cursor_color: .8, .8, .8, 1
     padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0] # centering
-    font_size: "20sp"
     write_tab: False    # for tab navigation
 
-<MatrixEditor>:
-#    size_hint_y: self.width / self.parent.height
-#    pos_hint: {'center_y': 0.5}
+<MatrixEditor>
+
+<OutputView@ScrollView>:
+    pos_hint_y: {'top': 0}
+    size_hint_x: 1
+    Label:
+        id: label
+        size_hint: None, None
+        size: self.texture_size
 
 <MyButton@Button>:
-    size_hint: (None, None)
-    text_size: self.width, None
+#    size_hint: (None, None)
+#    text_size: self.width, None
     halign: 'center'
-    height: '50dp'
+#    height: '50dp'
 
 <MatricesDisplay>:
     do_default_tab: False
@@ -34,6 +38,30 @@
     size: self.width, self.width
     pos_hint: {'top': 1}
 
+<ChooseFilePopup>:
+    title: "Choose an xml file"
+    size_hint: (None, None)
+    size: (400, 400)
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+            filters: ['*.xml']
+            path: "./xmls"
+        BoxLayout:
+            size_hint_y: 0.1
+            Button:
+                text: 'Cancel'
+                on_press: root.dismiss()
+            Button:
+                text: 'Choose'
+                on_press: root.on_choose()
+
+<ScoreDisplay>:
+    GridLayout:
+        id: table
+        cols: 2
+        size_hint: 1, None
 
 <ControlPanel>:
     orientation: "vertical"
@@ -48,7 +76,11 @@
     orientation: "horizontal"
     CriterionSelect:
         id: criterion_select
+        size_hint_x: 0.5
     MatricesDisplay:
         id: matrices_display
     ControlPanel:
         id: control_panel
+        size_hint_x: 0.8
+        spacing: "15dp"
+        padding: ["15dp", "36dp", "5dp", "5dp"]

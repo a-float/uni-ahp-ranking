@@ -1,17 +1,14 @@
 from kivy.core.text import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
-from kivy.config import Config
-
-Config.set('graphics', 'width', '1200')
-Config.set('graphics', 'height', '600')
-Config.write()
 
 
 class MatrixInput(TextInput):
     def __init__(self, **kwargs):
-        if len(kwargs['text']) > 5:
+        self.shortable = kwargs.pop('shortable', True)
+        if self.shortable and len(kwargs['text']) > 5:
             kwargs['text'] = kwargs['text'][:5]
+        self.font_size = kwargs.pop('font_size', '20sp')
         self.grid_pos = kwargs.pop('pos', None)
         self.on_input_change = kwargs.pop("on_input_change", None)
         self.readonly = kwargs.pop('readonly', False)
@@ -42,7 +39,8 @@ class MatrixInput(TextInput):
         return False
 
     def check_text(self, instance, value):
-        self.text = self.text[:5]
+        if self.shortable:
+            self.text = self.text[:5]
         try:
             val = float(self.text)
             assert -9 <= val <= 9
@@ -68,11 +66,11 @@ class MatrixEditor(GridLayout):
         for y in range(self.cols):
             for x in range(self.cols):
                 if y == 0 and x == 0:
-                    inp = MatrixInput(text="", readonly=True)
+                    inp = MatrixInput(text="", readonly=True, font_size="5sp")
                 elif y == 0:
-                    inp = MatrixInput(text=children[x - 1].name, readonly=True)
+                    inp = MatrixInput(text=children[x - 1].name, readonly=True, font_size="15sp", shortable=False)
                 elif x == 0:
-                    inp = MatrixInput(text=children[y - 1].name, readonly=True)
+                    inp = MatrixInput(text=children[y - 1].name, readonly=True, font_size="15sp", shortable=False)
                 else:
                     is_lower_triangle = y >= x
                     # if idx == -1, this matrix is the aggregated one - make is readonly
@@ -85,7 +83,6 @@ class MatrixEditor(GridLayout):
                 self.add_widget(inp)
 
     def on_input_change(self, inp_pos):
-        print('wow '+ str(inp_pos))
         if str(inp_pos) not in self.inputs:
             return
         text = self.inputs[str(inp_pos)].text
