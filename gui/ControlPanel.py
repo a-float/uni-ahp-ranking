@@ -59,7 +59,6 @@ class ControlPanel(BoxLayout):
 
     def update(self):
         scores, names = self.cli.selected_criterion.get_all_scores()
-        print(scores, names)
         self.score_display.update(scores, names, self.cli.selected_criterion.name)
 
     def setup_score_display(self):

@@ -20,7 +20,7 @@ class ScoreDisplay(ScrollView):
                 label = Label(text="", halign="left")
                 # if y != 0:  # keep the headers centered
                 #     label.bind(size=label.setter('text_size'))
-                label.font_size = "20sp"
+                label.font_size = "18sp"
                 grid.add_widget(label)
                 self.labels[str((x, y))] = label
         self.labels[str((0, 0))].text = "Alternative"

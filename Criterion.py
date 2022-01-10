@@ -262,7 +262,6 @@ class Criterion(Node):
 
         """są dwie metody dla macierzy kompletnych i jedna dla niekompletnych"""
         CI = None
-        print(method)
         if self.is_complete():
             log.debug("# Calculating inconsistency for a complete matrix")
             # method = input("METHOD = [SCI or GW] ")
