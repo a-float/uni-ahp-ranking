@@ -1,4 +1,3 @@
-from kivy.core.text import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 
@@ -56,7 +55,8 @@ class MatrixInput(TextInput):
 class MatrixEditor(GridLayout):
     def __init__(self, **kwargs):
         self.matrix = kwargs.pop('matrix')
-        children = kwargs.pop('children')
+        headers = kwargs.pop('children')
+        self.on_matrix_edit = kwargs.pop('on_matrix_edit')
         self.idx = kwargs.pop('idx')
         self.cols = self.matrix.shape[1] + 1  # +1 for the headers
         super().__init__(**kwargs)
@@ -68,9 +68,9 @@ class MatrixEditor(GridLayout):
                 if y == 0 and x == 0:
                     inp = MatrixInput(text="", readonly=True, font_size="5sp")
                 elif y == 0:
-                    inp = MatrixInput(text=children[x - 1].name, readonly=True, font_size="15sp", shortable=False)
+                    inp = MatrixInput(text=headers[x - 1].name, readonly=True, font_size="15sp", shortable=False)
                 elif x == 0:
-                    inp = MatrixInput(text=children[y - 1].name, readonly=True, font_size="15sp", shortable=False)
+                    inp = MatrixInput(text=headers[y - 1].name, readonly=True, font_size="15sp", shortable=False)
                 else:
                     is_lower_triangle = y >= x
                     # if idx == -1, this matrix is the aggregated one - make is readonly
@@ -97,3 +97,4 @@ class MatrixEditor(GridLayout):
             sym_input.text = str(-value)
         else:
             sym_input.text = str(1 / value)
+        self.on_matrix_edit() # TODO add it back?

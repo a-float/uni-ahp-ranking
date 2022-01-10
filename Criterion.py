@@ -1,5 +1,4 @@
 from numpy.core.fromnumeric import size
-from numpy.lib.function_base import select
 from Node import Node
 from Alternative import Alternative
 import xml.etree.ElementTree as ET
@@ -9,8 +8,12 @@ import logging
 
 EVM = "EVM"
 GMM = "GMM"
-complete_methods = [EVM, GMM]
-incomplete_methods = ["SCI", "GW", "SH"]
+SCI = "SCI"
+GW = "GW"
+SH = "SH"
+calc_weight_methods = [EVM, GMM]
+ic_complete_methods = [SCI, GW]
+ic_incomplete_methods = [SH]
 log = logging.getLogger('mylogger')
 
 
@@ -41,7 +44,7 @@ class Criterion(Node):
             self.has_custom_matrix = True  # successfully loaded at least one matrix
 
         # set the children weights
-        self.update_weights()
+        self._update_weights()
         log.info(f"Created criterion {self.name}")
 
     def is_complete(self):
@@ -60,9 +63,7 @@ class Criterion(Node):
             res += sep + sep.join(criteria)
         return res
 
-    def update_weights(self):
-        if not self.is_aggregated:
-            self.aggregate()
+    def _update_weights(self):
         weights = self.calculate_weights(self.matrix, self.is_complete)
         for i, w in enumerate(weights):
             self.children[i].set_weight(w)
@@ -104,7 +105,6 @@ class Criterion(Node):
 
     def reset_matrix(self, idx):
         self.matrices[idx] = np.ones(self.matrices[idx].shape)
-        self.update_weights()
         self.is_aggregated = False
         self.aggregate()
         log.info(f"# Matrix {idx} reset")
@@ -157,7 +157,7 @@ class Criterion(Node):
         self.matrices.append(new_matrix)
         self.matrices_completion.append(complete)
         self.is_aggregated = False
-        self.update_weights()
+        self.aggregate()
         log.info(f"# Added matrix for {self.name}")
 
     # Aggregated matrix is the geometric average of all sub matrices
@@ -170,6 +170,7 @@ class Criterion(Node):
             r = len(self.matrices)
             self.matrix **= (1 / r)
         self.is_aggregated = True
+        self._update_weights()
 
     def load_all_matrices(self, root):
         nodes = root.findall(f".//matrix[@for='{self.name}']")
@@ -237,9 +238,9 @@ class Criterion(Node):
                 value.set('y', str(i))
                 value.text = str(matrix[i, j])
 
-    def save_decision_matrices(self, data_node):
+    def _save_decision_matrices(self, data_node):
         """
-        updates the etree matrix node for this criterion. Removes the current one and creates one with the
+        Updates the etree matrix node for this criterion. Removes the current one and creates one with the
         current matrix data instead if self.has_custom_node == True
         """
         old_matrices = data_node.findall(f"./matrix[@for='{self.name}']")
@@ -249,9 +250,8 @@ class Criterion(Node):
             self.create_matrix_node_at(data_node, matrix)
         if not self.is_final_criterion:
             for child in self.children:
-                child.save_decision_matrices(data_node)
+                child._save_decision_matrices(data_node)
 
-    # TODO make static
     def ic(self, method):
         """Calculates the inconsistency and it's ratio using the specified method"""
         if not self.is_aggregated:
@@ -262,17 +262,18 @@ class Criterion(Node):
 
         """są dwie metody dla macierzy kompletnych i jedna dla niekompletnych"""
         CI = None
+        print(method)
         if self.is_complete():
-            log.info("# Calculating inconsistency for a complete matrix")
+            log.debug("# Calculating inconsistency for a complete matrix")
             # method = input("METHOD = [SCI or GW] ")
-            if method == "SCI":
+            if method == SCI:
                 # Saaty's consistency index
                 eigenvalues, eigenvector = map(np.real, np.linalg.eig(self.matrix))
                 lambda_max = np.amax(eigenvalues)
                 n = len(self.matrix)
                 CI = (lambda_max - n) / (n - 1)
                 # log.info("Inconsistency = " + str(CI))
-            elif method == "GW":
+            elif method == GW:
                 # Golden Wang index
                 n = len(self.matrix)
                 _C = np.zeros((n, n), dtype=np.float64)
@@ -298,8 +299,8 @@ class Criterion(Node):
                 CI = 1 / n * smm
                 # log.info("Inconsistency = " + str(CI))
         else:
-            log.info("# Calculating inconsistency for an incomplete matrix")
-            log.info("# Using the Saaty-Harker method")
+            log.debug("# Calculating inconsistency for an incomplete matrix")
+            log.debug("# Using the Saaty-Harker method")
             method = "SH"
             if method == "SH":
                 # Saaty-Harker
@@ -330,7 +331,7 @@ class Criterion(Node):
             # log.info("Consistency Ratio = " + str(CI / RI.get(n)))
             return CI, CI / RI.get(n)
         else:
-            log.error("Invalid parameters. CI is None or n < 3 and n > 20\n")
+            log.error("Invalid parameters. CI is None or n < 3 and n > 20")
             return None, None
 
     def wgmu(self, i, n):
@@ -340,10 +341,9 @@ class Criterion(Node):
         res = res ** (1 / n)
         return res
 
-    # TODO make static
     def calculate_weights(self, matrix, is_complete):
         method = self.calc_weight_method
-        assert method in [EVM, GMM], "Invalid method for calculating weight"
+        assert method in calc_weight_methods, "Invalid method for calculating weight"
         if is_complete:
             if method == EVM:
                 """ finds the orthogonal vector of the decision matrix with maximum length """
@@ -421,3 +421,10 @@ class Criterion(Node):
                 for i in range(0, size(w)):
                     res[i] = w_scaled[i]
                 return res
+
+    def set_all_calc_weight_method(self, new_method):
+        self.calc_weight_method = new_method
+        self._update_weights()
+        if not self.is_final_criterion:
+            for crit in self.children:
+                crit.set_all_calc_weight_method(new_method)

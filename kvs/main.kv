@@ -15,7 +15,7 @@
 
 <MatrixEditor>
 
-<OutputView@ScrollView>:
+<OutputView>:
     pos_hint_y: {'top': 0}
     size_hint_x: 1
     Label:
@@ -23,7 +23,7 @@
         size_hint: None, None
         size: self.texture_size
 
-<MyButton@Button>:
+<MyButton>:
 #    size_hint: (None, None)
 #    text_size: self.width, None
     halign: 'center'
@@ -34,8 +34,8 @@
     tab_height: '30dp'
     tab_width: "30dp"
     # 1:1 ratio
-    size_hint: 1, None
-    size: self.width, self.width
+    size_hint: 1, 1
+    size: min(self.width,self.height), min(self.width, self.height)
     pos_hint: {'top': 1}
 
 <ChooseFilePopup>:
@@ -57,6 +57,17 @@
                 text: 'Choose'
                 on_press: root.on_choose()
 
+<MethodSelect>:
+    BoxLayout:
+        size_hint: 1, 1
+        spacing: '20dp'
+        height: '30dp'
+        Label:
+            text_size: self.size
+            halign: 'left'
+            valign: 'center'
+            text: root.descr
+
 <ScoreDisplay>:
     GridLayout:
         id: table
@@ -77,10 +88,22 @@
     CriterionSelect:
         id: criterion_select
         size_hint_x: 0.5
-    MatricesDisplay:
-        id: matrices_display
+    BoxLayout:
+        orientation:'vertical'
+        MatricesDisplay:
+            id: matrices_display
+        BoxLayout:
+            size_hint: 1, None
+            orientation: 'vertical'
+            padding: "5dp", "0dp", "0dp", "0dp"
+            id: consistency_display
+            Label:
+                text_size: self.size
+                halign: 'left'
+                valign: 'center'
+                text: root.inconsistency_text
     ControlPanel:
         id: control_panel
         size_hint_x: 0.8
         spacing: "15dp"
-        padding: ["15dp", "36dp", "5dp", "5dp"]
+        padding: ["15dp", "36dp", "5dp", "15dp"]

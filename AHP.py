@@ -3,7 +3,7 @@ from Criterion import Criterion
 
 
 class AHP:
-    """ acts as an interface for interacting with the AHP tree """
+    """Acts as an interface for interacting with the AHP tree """
 
     def __init__(self, filename):
         try:
@@ -19,9 +19,12 @@ class AHP:
             self.alternatives.append(alt_node.get('name'))
 
     def save_decisions(self, filename):
-        self.root_criterion.save_decision_matrices(self.tree.find('data'))
+        self.root_criterion._save_decision_matrices(self.tree.find('data'))
         ET.indent(self.tree, space="\t", level=0)
         self.tree.write(filename)
+
+    def set_all_calc_weight_method(self, new_method):
+        self.root_criterion.set_all_calc_weight_method(new_method)
 
     def find_criterion(self, name):
         return self.root_criterion.find_criterion(name)
