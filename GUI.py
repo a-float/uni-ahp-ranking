@@ -106,7 +106,7 @@ class MainApp(App):
     def build(self):
         try:
             os.mkdir("xmls")  # try to make a directory for rankings
-            log.error("Created xmls folder")
+            log.info("Created xmls folder")
         except:
             pass
         return Controller()
