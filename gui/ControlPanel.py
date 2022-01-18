@@ -1,7 +1,9 @@
 import logging
 from typing import Optional
+from pathlib import Path
 
 import numpy as np
+from kivy.properties import StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserListView
@@ -26,6 +28,13 @@ class ChooseFilePopup(Popup):
     pass
 
 
+class TextInputPopup(Popup):
+    def __init__(self, **kwargs):
+        self.label_text = kwargs.pop('label_text')
+        self.on_choose = kwargs.pop('on_choose')
+        super().__init__(**kwargs)
+
+
 class MyFileChooser(FileChooserListView):
     pass
 
@@ -44,8 +53,11 @@ class ControlPanel(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # all set in setup, sorry
+        self.removeAlternativePopup = None
+        self.addAlternativePopup = None
+        self.rankingNameInputPopup = None
         self.score_display = None
-        self.popup = None
+        self.fileChoosePopup = None
         self.output = None  # log output label
         self.cli: Optional[CLI] = None
         self.on_change_ahp = None
@@ -74,6 +86,48 @@ class ControlPanel(BoxLayout):
             return True
         return False
 
+    def create_ahp(self):
+        self.rankingNameInputPopup.dismiss()
+        input = self.rankingNameInputPopup.ids['text_input'].text
+        split = input.split()
+        if not split:
+            log.error("Invalid goal name")
+            return
+        goal_name = ' '.join(split)
+        filename = '_'.join(split) + ".xml"
+        Path("./xmls/").mkdir(parents=True, exist_ok=True)
+        if Path('./xmls/' + filename).exists():
+            log.error(f"File {filename} already exists in the xml directory")
+            return
+        with open('./xmls/' + filename, 'w') as f:
+            f.writelines(['<?xml version="1.0" encoding="UTF-8"?>\n',
+                          "<root>\n",
+                          f'<criterion name="Goal" goal="{goal_name}">"</criterion>\n',
+                          "<alternatives></alternatives>\n",
+                          "<data></data>\n",
+                          "</root>\n"])
+        self.cli.on_load(f"./xmls/{filename}")
+        self.on_change_ahp()
+
+    def modify_alternatives(self, remove=False):
+        popup = self.addAlternativePopup if not remove else self.removeAlternativePopup
+        popup.dismiss()
+        if not self.cli.ahp:
+            log.error("No ahp loaded")
+            return
+        name = popup.ids['text_input'].text
+        popup.ids['text_input'].text = ""  # clear input
+        if len(name) > 0:
+            log.info("All matrices dependent on alternatives will be removed")
+            if not remove:
+                self.cli.ahp.add_alternative(name)
+            else:
+                self.cli.ahp.remove_alternative(name)
+            self.update()
+            self.on_edit_criterion()
+        else:
+            log.error("No name specified")
+
     def setup(self, **kwargs):
         """Creates the layout. Buttons, scores, method dropdowns and console log"""
         self.cli = kwargs['cli']
@@ -81,17 +135,26 @@ class ControlPanel(BoxLayout):
         self.on_change_ahp = kwargs['on_change_ahp']
         self.on_edit_criterion = kwargs['on_edit_criterion']
         self.on_change_ic_method = kwargs.pop('on_change_ic_method')
-        self.popup = ChooseFilePopup()
-        self.popup.on_choose = self.load_ahp
+        self.fileChoosePopup = ChooseFilePopup()
+        self.fileChoosePopup.on_choose = self.load_ahp
+        self.rankingNameInputPopup = TextInputPopup(label_text="What is your goal?", on_choose=self.create_ahp)
+        self.addAlternativePopup = TextInputPopup(label_text="What is the new alternatives name?",
+                                                  on_choose=lambda: self.modify_alternatives())
+        self.removeAlternativePopup = TextInputPopup(
+            label_text="What is the name of the alternative you want to remove?",
+            on_choose=lambda: self.modify_alternatives(True))
 
         # cont = BoxLayout(orientation="vertical")
         cont = GridLayout(cols=3)
-        cont.size_hint_y = 0.3
+        cont.size_hint_y = 0.5
         btns = [MyButton(text="Save matrix", on_press=self.save_matrix),
                 MyButton(text="Remove matrix", on_press=self.remove_matrix),
                 MyButton(text="Add matrix", on_press=self.add_matrix),
                 MyButton(text="Reset matrix", on_press=self.reset_matrix),
-                MyButton(text="Load ranking", on_press=self.popup.open),
+                MyButton(text="Load ranking", on_press=self.fileChoosePopup.open),
+                MyButton(text="New ranking", on_press=self.rankingNameInputPopup.open),
+                MyButton(text="Add alternative", on_press=self.addAlternativePopup.open),
+                MyButton(text="Remove alternative", on_press=self.removeAlternativePopup.open),
                 MyButton(text="Save to file", on_press=self.save_all)
                 ]
         for btn in btns:
@@ -126,8 +189,8 @@ class ControlPanel(BoxLayout):
         log.info(f"Ranking saved successfully to {filename}")
 
     def load_ahp(self):
-        self.popup.dismiss()
-        self.cli.on_load(self.popup.ids['filechooser'].selection[0])
+        self.fileChoosePopup.dismiss()
+        self.cli.on_load(self.fileChoosePopup.ids['filechooser'].selection[0])
         self.on_change_ahp()
 
     def save_matrix(self, instance):

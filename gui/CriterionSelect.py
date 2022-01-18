@@ -31,11 +31,12 @@ class CriterionSelect(BoxLayout):
 
     @staticmethod
     def populate_tree_view(tree_view, parent, node: Node):
+        name = node.name
         if parent is None:
-            tree_node = tree_view.add_node(TreeViewLabel(text=node.name,
+            tree_node = tree_view.add_node(TreeViewLabel(text=name,
                                                          is_open=True))
         else:
-            tree_node = tree_view.add_node(TreeViewLabel(text=node.name,
+            tree_node = tree_view.add_node(TreeViewLabel(text=name,
                                                          is_open=True), parent)
 
         for child_node in node.children:

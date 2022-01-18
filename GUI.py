@@ -15,7 +15,7 @@ kivy.require('2.0.0')
 from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty
-import gui
+import gui # needs to be there for kivy
 import logging
 
 log = logging.getLogger('mylogger')
@@ -28,7 +28,7 @@ class Controller(BoxLayout):
         self.cli = CLI()
         self.ic_method = ic_complete_methods[0]
         super().__init__(**kwargs)
-        self.cli.on_load("xmls/data_leaders.xml")
+        # self.cli.on_load("xmls/data_leaders.xml")
         self.ids['criterion_select'].setup(
             cli=self.cli,
             on_select_criterion=self.on_select
@@ -45,12 +45,14 @@ class Controller(BoxLayout):
             on_change_ic_method=self.on_change_ic_method
         )
         self.ids['criterion_select'].update()
-        self.update_inconsistency()
-        Clock.schedule_once(lambda _: self.on_change_ahp(), 0.1)
+        if self.cli.ahp:
+            self.update_inconsistency()
+        # Clock.schedule_once(lambda _: self.on_change_ahp(), 0.1)
 
     def on_edit_criterion(self):
         self.ids['matrices_display'].update()
-        self.ids['control_panel'].setup_score_display()  # let the score table know how many rows to make
+        # if self.cli.ahp:
+        #     self.ids['control_panel'].setup_score_display()  # let the score table know how many rows to make
         self.ids['control_panel'].update()
         self.update_inconsistency()
 
@@ -81,11 +83,12 @@ class Controller(BoxLayout):
 
     def on_select(self, criterion_name):
         # do something only if the selection has changed
-        if not self.cli.selected_criterion or self.cli.selected_criterion.name != criterion_name:
-            self.cli.on_select(criterion_name)
-            self.ids['matrices_display'].update()
-            self.ids['control_panel'].update()
-            self.update_inconsistency()
+        if self.cli.selected_criterion:
+            if not self.cli.selected_criterion or self.cli.selected_criterion.name != criterion_name:
+                self.cli.on_select(criterion_name)
+                self.ids['matrices_display'].update()
+                self.ids['control_panel'].update()
+                self.update_inconsistency()
 
     def update_inconsistency(self):
         ic, icr = self.cli.selected_criterion.ic(self.ic_method)

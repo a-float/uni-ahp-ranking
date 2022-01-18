@@ -5,7 +5,7 @@
     # tree view generated in the py file
 
 <MatrixInput>:
-    multiline: False
+#    multiline: False
     halign: "left"
     background_color: .7, .7, .7, .4
     foreground_color: .9, .9, .9, 1
@@ -17,7 +17,7 @@
 
 <OutputView>:
     pos_hint_y: {'top': 0}
-    size_hint_x: 1
+    size_hint_x: 0.8
     Label:
         id: label
         size_hint: None, None
@@ -57,6 +57,28 @@
                 text: 'Choose'
                 on_press: root.on_choose()
 
+<TextInputPopup>:
+    title: root.label_text
+    size_hint: (None, None)
+    size: (300, 150)
+    BoxLayout:
+        spacing: 10
+        orientation: 'vertical'
+        TextInput:
+            size_hint_y: None
+            height: "30dp"
+            id: text_input
+            multiline: False
+        BoxLayout:
+            size_hint_y: None
+            height: "40dp"
+            Button:
+                text: 'Cancel'
+                on_press: root.dismiss()
+            Button:
+                text: 'Choose'
+                on_press: root.on_choose()
+
 <MethodSelect>:
     BoxLayout:
         size_hint: 1, 1
@@ -70,6 +92,7 @@
 
 <ScoreDisplay>:
     GridLayout:
+        height: self.minimum_height
         id: table
         cols: 2
         size_hint: 1, None

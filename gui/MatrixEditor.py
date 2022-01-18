@@ -20,6 +20,7 @@ class MatrixInput(TextInput):
             self.foreground_color = .75, .75, .75, 1
 
     def insert_text(self, diff, from_undo=False):
+        diff = diff.replace("\n", "")
         if not self.readonly and len(self.text + diff) <= 5:
             super().insert_text(diff, from_undo)
 

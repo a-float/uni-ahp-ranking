@@ -72,14 +72,14 @@ class Criterion(Node):
         node = self
         while not node.is_final_criterion:
             node = node.children[0]
-        alt_count = len(node.children)  # get the alternative count, needed for the range
+        alt_count = len(node.children)  # get the alternative count, for the range
         # run the actual calculations
         return self.get_scores_for(list(range(alt_count)))
 
     def get_scores_for(self, indices):
         if not self.is_aggregated:
             self.aggregate()
-        """ performs the AHP scores calculation with respect to the self criterion """
+        """ performs the AHP scores calculation with respect to self """
         names = None
         if self.is_final_criterion:
             res = np.array([alt.weight for alt in self.children])[indices]
@@ -254,6 +254,8 @@ class Criterion(Node):
 
     def ic(self, method):
         """Calculates the inconsistency and it's ratio using the specified method"""
+        if not self.children:
+            return 0, 0 # no data = no inconsistency
         if not self.is_aggregated:
             self.aggregate()
         # inconsistency + consistency ratio
@@ -296,12 +298,13 @@ class Criterion(Node):
                     for j in range(n):
                         smm += abs(_C[i][j] - wgm[i])
                 CI = 1 / n * smm
-                # log.info("Inconsistency = " + str(CI))
+                # log.info("Inconsistency = " + str(CI)
+            else:
+                log.debug(f"Tried using {method} for a complete matrix")
         else:
             log.debug("# Calculating inconsistency for an incomplete matrix")
             log.debug("# Using the Saaty-Harker method")
-            method = "SH"
-            if method == "SH":
+            if method == SH:
                 # Saaty-Harker
                 # 151
                 n = len(self.matrix)
@@ -325,6 +328,8 @@ class Criterion(Node):
                 max_arg = np.amax(eigenvalues)
                 CI = max_arg - n / (n - 1)
                 # log.info("Inconsistency = " + str(CI))
+            else:
+                log.debug(f"Tried using {method} for an incomplete matrix")
 
         if CI is not None and 3 <= n <= 20:
             # log.info("Consistency Ratio = " + str(CI / RI.get(n)))
@@ -341,6 +346,8 @@ class Criterion(Node):
         return res
 
     def calculate_weights(self, matrix, is_complete):
+        if not self.children:
+            return [] # nothing to calculate
         method = self.calc_weight_method
         assert method in calc_weight_methods, "Invalid method for calculating weight"
         if is_complete:
@@ -427,3 +434,21 @@ class Criterion(Node):
         if not self.is_final_criterion:
             for crit in self.children:
                 crit.set_all_calc_weight_method(new_method)
+
+    def add_alternative(self, new_node):
+        if self.is_final_criterion:
+            self.matrices.clear()   # remove all matrices, now of wrong shapes
+            self.children.append(Alternative(new_node, self))
+            self.matrix = np.ones((len(self.children),) * 2)  # reshape aggregated matrix
+        else:
+            for child in self.children:
+                child.add_alternative(new_node)
+
+    def remove_alternative(self, name):
+        if self.is_final_criterion:
+            self.matrices.clear()  # remove all matrices, now of wrong shapes
+            self.children = list(filter(lambda a: a.name != name, self.children))
+            self.matrix = np.ones((len(self.children),) * 2)  # reshape aggregated matrix
+        else:
+            for child in self.children:
+                child.remove_alternative(name)

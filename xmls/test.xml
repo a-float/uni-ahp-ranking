@@ -9,19 +9,16 @@
 	</alternatives>
 	<data>
 		<matrix for="Goal" width="5" height="5">
-			<value x="0" y="1">9</value>
-			<value x="0" y="2">0</value>
-			<value x="0" y="3">0</value>
-			<value x="0" y="4">9</value>
-
-			<value x="1" y="2">0</value>
-			<value x="1" y="3">1.75</value>
-			<value x="1" y="4">0</value>
-
-			<value x="2" y="3">0</value>
-			<value x="2" y="4">0.3</value>
-
-			<value x="3" y="4">9</value>
+			<value x="1" y="0">0.111</value>
+			<value x="2" y="0">5.0</value>
+			<value x="3" y="0">0.0</value>
+			<value x="4" y="0">0.111</value>
+			<value x="2" y="1">0.0</value>
+			<value x="3" y="1">0.571</value>
+			<value x="4" y="1">0.0</value>
+			<value x="3" y="2">0.0</value>
+			<value x="4" y="2">3.333</value>
+			<value x="4" y="3">0.111</value>
 		</matrix>
 	</data>
 </root>
