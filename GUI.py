@@ -101,6 +101,7 @@ class Controller(BoxLayout):
 
 class MainApp(App):
     kv_directory = "kvs"
+    title = "AHP Solicitor"
 
     def build(self):
         try:

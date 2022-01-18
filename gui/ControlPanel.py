@@ -190,7 +190,7 @@ class ControlPanel(BoxLayout):
                 MyButton(text="Remove matrix", on_press=self.remove_matrix),
                 MyButton(text="Reset matrix", on_press=self.reset_matrix),
                 MyButton(text="Add alternative", on_press=self.addAlternativePopup.open),
-                MyButton(text="Remove alternative", on_press=self.removeAlternativePopup.open),
+                MyButton(text="Erase alternative", on_press=self.removeAlternativePopup.open),
                 MyButton(text="Add criterion", on_press=self.addCriterionPopup.open),
                 MyButton(text="Remove criterion", on_press=self.remove_criterion),
                 MyButton(text="Save to file", on_press=self.chooseSaveNamePopup.open)
