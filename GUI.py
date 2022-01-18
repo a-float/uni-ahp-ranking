@@ -92,6 +92,8 @@ class Controller(BoxLayout):
         ic, icr = self.cli.selected_criterion.ic(self.ic_method)
         if ic is None:
             log.error(f"Invalid method. Can not use {self.ic_method} with current matrices")
+            self.inconsistency_text = f'Inconsistency = ?\n\n'
+            self.inconsistency_text += f'Inconsistency ratio = ?'
             return
         self.inconsistency_text = f'Inconsistency = {"{:.5f}".format(ic)}\n\n'
         self.inconsistency_text += f'Inconsistency ratio = {"{:.5f}".format(icr)}'
