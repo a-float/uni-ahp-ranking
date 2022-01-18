@@ -37,7 +37,6 @@ class ScoreDisplay(ScrollView):
                     self.labels[str((x, y))] = label
 
         self.labels[str((1, 0))].text = f"Score for {criterion_name}"
-        print(names)
         for i, name in enumerate(names):
             self.labels[str((0, i + 1))].text = name
             self.labels[str((1, i + 1))].text = str(scores[i])[:SCORE_ACC]

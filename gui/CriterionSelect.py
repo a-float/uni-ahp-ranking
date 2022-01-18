@@ -1,8 +1,6 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.treeview import TreeViewLabel, TreeView
 
-from Node import Node
-
 
 class CriterionSelect(BoxLayout):
     def __init__(self, **kwargs):
@@ -17,7 +15,7 @@ class CriterionSelect(BoxLayout):
         self.cli = kwargs['cli']
         self.on_select_criterion = kwargs['on_select_criterion']
 
-    def update(self):  # TODO tree view reload and update
+    def update(self):
         if self.cli.ahp:
             for node in [i for i in self.tv.iterate_all_nodes()]:
                 self.tv.remove_node(node)
@@ -30,7 +28,7 @@ class CriterionSelect(BoxLayout):
                 self.on_select_criterion(node.text)
 
     @staticmethod
-    def populate_tree_view(tree_view, parent, node: Node):
+    def populate_tree_view(tree_view, parent, node):
         name = node.name
         if parent is None:
             tree_node = tree_view.add_node(TreeViewLabel(text=name,
@@ -38,7 +36,6 @@ class CriterionSelect(BoxLayout):
         else:
             tree_node = tree_view.add_node(TreeViewLabel(text=name,
                                                          is_open=True), parent)
-
-        for child_node in node.children:
-            if child_node.children:  # do not create views for alternatives
+        if not node.is_final_criterion:
+            for child_node in node.children:
                 CriterionSelect.populate_tree_view(tree_view, tree_node, child_node)

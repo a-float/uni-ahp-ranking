@@ -20,18 +20,19 @@ log = logging.getLogger('mylogger')
 class Criterion(Node):
     """ Represents a criterion node. Manages weights for its children using the decision matrix """
 
-    def __init__(self, node, root):
+    def __init__(self, node, root, parent):
         """node is the xml criterion node for this node, root is the root of the xml tree"""
-        super().__init__(node)
+        super().__init__(node.get('name'), parent)
         self.is_final_criterion = False  # True if it's children all are Alternatives
         self.calc_weight_method = EVM
         self.has_custom_matrix = False
+        self.tree_root = root
         for cat_node in node:
-            self.children.append(Criterion(cat_node, root))
+            self.children.append(Criterion(cat_node, root, self))
         if not self.children:
             self.is_final_criterion = True
             for alt_node in root.find('alternatives'):
-                self.children.append(Alternative(alt_node, self))
+                self.children.append(Alternative(alt_node.get('name'), self))
 
         self.matrix = np.ones((len(self.children),) * 2)  # the aggregated matrix
         self.matrices_completion = []  # ith element is True if ith matrix is complete, otherwise its 0
@@ -174,6 +175,7 @@ class Criterion(Node):
 
     def load_all_matrices(self, root):
         nodes = root.findall(f".//matrix[@for='{self.name}']")
+        nodes.sort(key=lambda n: int(n.get('id')) if n.get('id') else 0)
         for node in nodes:
             self.add_matrix(*self.load_matrix(node))
 
@@ -224,10 +226,11 @@ class Criterion(Node):
             results = ([node.find_criterion(name) for node in self.children])
             return next((item for item in results if item is not None), None)
 
-    def create_matrix_node_at(self, node, matrix):
+    def create_matrix_node_at(self, node, matrix, idx):
         """ creates a matrix node in the specified node of the etree with the decision matrix data """
         new_matrix = ET.SubElement(node, 'matrix')
         new_matrix.set('for', self.name)
+        new_matrix.set('id', str(idx))
         x, y = self.matrix.shape
         new_matrix.set('width', str(x))
         new_matrix.set('height', str(y))
@@ -246,16 +249,16 @@ class Criterion(Node):
         old_matrices = data_node.findall(f"./matrix[@for='{self.name}']")
         for matrix in old_matrices:
             data_node.remove(matrix)
-        for matrix in self.matrices:
-            self.create_matrix_node_at(data_node, matrix)
+        for i, matrix in enumerate(self.matrices):
+            self.create_matrix_node_at(data_node, matrix, i)
         if not self.is_final_criterion:
             for child in self.children:
                 child._save_decision_matrices(data_node)
 
     def ic(self, method):
         """Calculates the inconsistency and it's ratio using the specified method"""
-        if not self.children:
-            return 0, 0 # no data = no inconsistency
+        if len(self.children) < 3:
+            return 0, 0  # no data = no inconsistency
         if not self.is_aggregated:
             self.aggregate()
         # inconsistency + consistency ratio
@@ -335,7 +338,7 @@ class Criterion(Node):
             # log.info("Consistency Ratio = " + str(CI / RI.get(n)))
             return CI, CI / RI.get(n)
         else:
-            log.error("Invalid parameters. CI is None or n < 3 and n > 20")
+            # log.error("Invalid parameters. CI is None or n < 3 and n > 20")
             return None, None
 
     def wgmu(self, i, n):
@@ -347,7 +350,7 @@ class Criterion(Node):
 
     def calculate_weights(self, matrix, is_complete):
         if not self.children:
-            return [] # nothing to calculate
+            return []  # nothing to calculate
         method = self.calc_weight_method
         assert method in calc_weight_methods, "Invalid method for calculating weight"
         if is_complete:
@@ -437,18 +440,49 @@ class Criterion(Node):
 
     def add_alternative(self, new_node):
         if self.is_final_criterion:
-            self.matrices.clear()   # remove all matrices, now of wrong shapes
             self.children.append(Alternative(new_node, self))
-            self.matrix = np.ones((len(self.children),) * 2)  # reshape aggregated matrix
+            self.clear()  # remove all matrices, now of wrong shapes
         else:
             for child in self.children:
                 child.add_alternative(new_node)
 
     def remove_alternative(self, name):
         if self.is_final_criterion:
-            self.matrices.clear()  # remove all matrices, now of wrong shapes
-            self.children = list(filter(lambda a: a.name != name, self.children))
-            self.matrix = np.ones((len(self.children),) * 2)  # reshape aggregated matrix
+            self.children = list(filter(lambda c: c.name != name, self.children))
+            self.clear()  # remove all matrices, now of wrong shapes
         else:
+            print("Passing to children " + str(self.children))
             for child in self.children:
                 child.remove_alternative(name)
+
+    def add_subcriterion(self, name):
+        thisNode = self.tree_root.find(f".//criterion[@name='{self.name}']")
+        newNode = ET.SubElement(thisNode, "criterion")
+        newNode.set("name", name)
+        newCrit = Criterion(newNode, self.tree_root, self)
+        if self.is_final_criterion:
+            print("Wash final")
+            self.is_final_criterion = False
+            self.children.clear()
+        self.children.append(newCrit)
+        self.clear()
+
+    def remove(self):
+        if not self.parent:
+            print("Can not remove the root criterion")
+            return
+        self.parent.children.remove(self)
+        if not self.parent.children:
+            self.parent.children = self.children  # pass the list of alternatives
+            self.parent.is_final_criterion = True
+        self.parent.clear()
+
+    def reshape_main_matrix(self):
+        self.matrix = np.ones((len(self.children),) * 2)  # reshape aggregated matrix
+
+    def clear(self):
+        log.info(f"Clearing criterion {self.name}")
+        self.matrices.clear()  # remove all matrices, now of wrong shapes
+        self.matrices_completion.clear()
+        self.reshape_main_matrix()
+        self.aggregate()

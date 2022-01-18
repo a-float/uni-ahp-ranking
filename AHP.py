@@ -14,14 +14,15 @@ class AHP:
         self.filename = filename
         self.alternatives = []  # alist of alternatives' names
         # the actual root of the tree
-        self.root_criterion = Criterion(root.find('./criterion'), root)
+        self.root_criterion = Criterion(root.find('./criterion'), root, None)  # root criterion has no parent
         for alt_node in root.find('alternatives'):
             self.alternatives.append(alt_node.get('name'))
 
-    def save_decisions(self, filename):
+    def save_to_file(self, filename):
         self.root_criterion._save_decision_matrices(self.tree.find('data'))
         ET.indent(self.tree, space="\t", level=0)
-        self.tree.write(filename)
+        with open(filename, 'wb') as f:
+            self.tree.write(f)
 
     def set_all_calc_weight_method(self, new_method):
         self.root_criterion.set_all_calc_weight_method(new_method)
@@ -34,13 +35,19 @@ class AHP:
         new_node = ET.SubElement(alternatives_node, 'alternative')
         new_node.set('name', alt_name)
         self.alternatives.append(alt_name)
-        self.root_criterion.add_alternative(new_node)
+        self.root_criterion.add_alternative(alt_name)
+        return True
 
     def remove_alternative(self, name):
-        alt_node = self.tree.find("alternatives")
-        node = self.tree.find(f".//alternative[@name='{name}']")
-        alt_node.remove(node)
-        self.root_criterion.remove_alternative(name)
+        alternatives_node = self.tree.find('alternatives')
+        for node in alternatives_node:
+            if node.get('name') == name:
+                self.alternatives.remove(name)
+                alternatives_node.remove(node)
+                self.root_criterion.remove_alternative(name)
+                return True
+        else:
+            return False
 
     def __repr__(self):
         res = f"AHP object {self.__str__()} />"

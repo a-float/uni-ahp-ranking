@@ -7,7 +7,7 @@ Config.write()
 
 import kivy
 from CLI import CLI
-from kivy.clock import Clock
+import os
 from Criterion import ic_complete_methods
 
 kivy.require('2.0.0')
@@ -15,7 +15,7 @@ kivy.require('2.0.0')
 from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty
-import gui # needs to be there for kivy
+import gui  # needs to be there for kivy
 import logging
 
 log = logging.getLogger('mylogger')
@@ -51,8 +51,6 @@ class Controller(BoxLayout):
 
     def on_edit_criterion(self):
         self.ids['matrices_display'].update()
-        # if self.cli.ahp:
-        #     self.ids['control_panel'].setup_score_display()  # let the score table know how many rows to make
         self.ids['control_panel'].update()
         self.update_inconsistency()
 
@@ -92,7 +90,6 @@ class Controller(BoxLayout):
 
     def update_inconsistency(self):
         ic, icr = self.cli.selected_criterion.ic(self.ic_method)
-        print(ic)
         if ic is None:
             log.error(f"Invalid method. Can not use {self.ic_method} with current matrices")
             return
@@ -104,6 +101,10 @@ class MainApp(App):
     kv_directory = "kvs"
 
     def build(self):
+        try:
+            os.mkdir("xmls")  # try to make a directory for rankings
+        except:
+            pass
         return Controller()
 
 

@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Optional
 from pathlib import Path
 
@@ -53,6 +54,7 @@ class ControlPanel(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # all set in setup, sorry
+        self.addCriterionPopup = None
         self.removeAlternativePopup = None
         self.addAlternativePopup = None
         self.rankingNameInputPopup = None
@@ -120,13 +122,43 @@ class ControlPanel(BoxLayout):
         if len(name) > 0:
             log.info("All matrices dependent on alternatives will be removed")
             if not remove:
-                self.cli.ahp.add_alternative(name)
+                res = self.cli.ahp.add_alternative(name)
             else:
-                self.cli.ahp.remove_alternative(name)
-            self.update()
-            self.on_edit_criterion()
+                res = self.cli.ahp.remove_alternative(name)
+            if res:
+                self.on_edit_criterion()
+                log.info(f"Alternative {name} removed")
+            else:
+                log.error("Could not remove alternative " + name)
         else:
             log.error("No name specified")
+
+    def add_criterion(self):
+        popup = self.addCriterionPopup
+        popup.dismiss()
+        if not self.cli.ahp:
+            log.error("No ahp loaded")
+            return
+        name = popup.ids['text_input'].text
+        popup.ids['text_input'].text = ""  # clear input
+        if len(name) > 0:
+            log.info("All matrices dependent on alternatives will be removed")
+            self.cli.selected_criterion.add_subcriterion(name)
+            self.on_change_ahp()  # to update criterion select
+        else:
+            log.error("No name specified")
+
+    def remove_criterion(self, instance):
+        if not self.cli.ahp:
+            log.error("No ahp loaded")
+            return
+        if self.cli.selected_criterion == self.cli.ahp.root_criterion:
+            log.error("Can not remove the root criterion")
+            return
+        toSelectNext = self.cli.selected_criterion.parent
+        self.cli.selected_criterion.remove()
+        self.cli.selected_criterion = toSelectNext
+        self.on_change_ahp()  # to update criterion select
 
     def setup(self, **kwargs):
         """Creates the layout. Buttons, scores, method dropdowns and console log"""
@@ -139,23 +171,29 @@ class ControlPanel(BoxLayout):
         self.fileChoosePopup.on_choose = self.load_ahp
         self.rankingNameInputPopup = TextInputPopup(label_text="What is your goal?", on_choose=self.create_ahp)
         self.addAlternativePopup = TextInputPopup(label_text="What is the new alternatives name?",
-                                                  on_choose=lambda: self.modify_alternatives())
+                                                  on_choose=self.modify_alternatives)
         self.removeAlternativePopup = TextInputPopup(
             label_text="What is the name of the alternative you want to remove?",
             on_choose=lambda: self.modify_alternatives(True))
+        self.addCriterionPopup = TextInputPopup(label_text="Choose new criterion's name?",
+                                                on_choose=self.add_criterion)
+        self.chooseSaveNamePopup = TextInputPopup(
+            label_text="Choose filename to save to. Leave blank to overwrite the previously loaded file.",
+            on_choose=self.save_all)
 
-        # cont = BoxLayout(orientation="vertical")
         cont = GridLayout(cols=3)
-        cont.size_hint_y = 0.5
-        btns = [MyButton(text="Save matrix", on_press=self.save_matrix),
-                MyButton(text="Remove matrix", on_press=self.remove_matrix),
-                MyButton(text="Add matrix", on_press=self.add_matrix),
-                MyButton(text="Reset matrix", on_press=self.reset_matrix),
-                MyButton(text="Load ranking", on_press=self.fileChoosePopup.open),
+        cont.size_hint_y = 0.7
+        btns = [MyButton(text="Load ranking", on_press=self.fileChoosePopup.open),
                 MyButton(text="New ranking", on_press=self.rankingNameInputPopup.open),
+                MyButton(text="Apply matrix", on_press=self.apply_matrix),
+                MyButton(text="Add matrix", on_press=self.add_matrix),
+                MyButton(text="Remove matrix", on_press=self.remove_matrix),
+                MyButton(text="Reset matrix", on_press=self.reset_matrix),
                 MyButton(text="Add alternative", on_press=self.addAlternativePopup.open),
                 MyButton(text="Remove alternative", on_press=self.removeAlternativePopup.open),
-                MyButton(text="Save to file", on_press=self.save_all)
+                MyButton(text="Add criterion", on_press=self.addCriterionPopup.open),
+                MyButton(text="Remove criterion", on_press=self.remove_criterion),
+                MyButton(text="Save to file", on_press=self.chooseSaveNamePopup.open)
                 ]
         for btn in btns:
             cont.add_widget(btn)
@@ -183,9 +221,18 @@ class ControlPanel(BoxLayout):
         self.cli.ahp.set_all_calc_weight_method(new_method)
         self.update()
 
-    def save_all(self, instance):
-        filename = self.cli.ahp.filename
-        self.cli.ahp.save_decisions(filename)
+    def save_all(self):
+        if not self.cli.ahp:
+            log.error("No ahp loaded")
+            return
+        self.chooseSaveNamePopup.dismiss()
+        text = self.chooseSaveNamePopup.ids['text_input'].text
+        filename = self.cli.ahp.filename if not text else text
+        if not filename.endswith('.xml'):
+            filename += ".xml"
+        filename = os.path.basename(os.path.normpath(filename))
+        filename = os.path.join("xmls", filename)
+        self.cli.ahp.save_to_file(filename)
         log.info(f"Ranking saved successfully to {filename}")
 
     def load_ahp(self):
@@ -193,7 +240,7 @@ class ControlPanel(BoxLayout):
         self.cli.on_load(self.fileChoosePopup.ids['filechooser'].selection[0])
         self.on_change_ahp()
 
-    def save_matrix(self, instance):
+    def apply_matrix(self, instance):
         curr_idx = self.matrices_display.current_tab._label.text  # get selected tab's name
         if curr_idx == 'A':
             # TODO error?
