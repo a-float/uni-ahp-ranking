@@ -95,7 +95,7 @@ class ControlPanel(BoxLayout):
         if not split:
             log.error("Invalid goal name")
             return
-        goal_name = ' '.join(split)
+        goal_name = ' '.join(split).encode(encoding='ascii', errors="replace").decode()   # remove non ascii characters
         filename = '_'.join(split) + ".xml"
         Path("./xmls/").mkdir(parents=True, exist_ok=True)
         if Path('./xmls/' + filename).exists():
@@ -169,7 +169,7 @@ class ControlPanel(BoxLayout):
         self.on_change_ic_method = kwargs.pop('on_change_ic_method')
         self.fileChoosePopup = ChooseFilePopup()
         self.fileChoosePopup.on_choose = self.load_ahp
-        self.rankingNameInputPopup = TextInputPopup(label_text="What is your goal?", on_choose=self.create_ahp)
+        self.rankingNameInputPopup = TextInputPopup(label_text="Choose new ranking's filename:", on_choose=self.create_ahp)
         self.addAlternativePopup = TextInputPopup(label_text="What is the new alternatives name?",
                                                   on_choose=self.modify_alternatives)
         self.removeAlternativePopup = TextInputPopup(
