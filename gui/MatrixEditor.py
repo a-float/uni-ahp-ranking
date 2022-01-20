@@ -1,12 +1,14 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 
+MAX_INP_LEN = 6  # max amount of characters in a matrix input field = input accuracy
+
 
 class MatrixInput(TextInput):
     def __init__(self, **kwargs):
         self.shortable = kwargs.pop('shortable', True)
-        if self.shortable and len(kwargs['text']) > 5:
-            kwargs['text'] = kwargs['text'][:5]
+        if self.shortable and len(kwargs['text']) > MAX_INP_LEN:
+            kwargs['text'] = kwargs['text'][:MAX_INP_LEN]
         self.font_size = kwargs.pop('font_size', '20sp')
         self.grid_pos = kwargs.pop('pos', None)
         self.on_input_change = kwargs.pop("on_input_change", None)
@@ -21,7 +23,7 @@ class MatrixInput(TextInput):
 
     def insert_text(self, diff, from_undo=False):
         diff = diff.replace("\n", "")
-        if not self.readonly and len(self.text + diff) <= 5:
+        if not self.readonly and len(self.text + diff) <= MAX_INP_LEN:
             super().insert_text(diff, from_undo)
 
     def keyboard_on_key_down(self, window, keycode, text, modifiers):
@@ -40,7 +42,7 @@ class MatrixInput(TextInput):
 
     def check_text(self, instance, value):
         if self.shortable:
-            self.text = self.text[:5]
+            self.text = self.text[:MAX_INP_LEN]
         try:
             val = float(self.text)
             assert -9 <= val <= 9
@@ -98,4 +100,3 @@ class MatrixEditor(GridLayout):
             sym_input.text = str(-value)
         else:
             sym_input.text = str(1 / value)
-        self.on_matrix_edit() # TODO add it back?

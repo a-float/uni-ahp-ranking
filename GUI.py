@@ -35,7 +35,6 @@ class Controller(BoxLayout):
         )
         self.ids['matrices_display'].setup(
             cli=self.cli,
-            on_matrix_edit=self.on_edit_matrix
         )
         self.ids['control_panel'].setup(
             cli=self.cli,
@@ -44,8 +43,8 @@ class Controller(BoxLayout):
             matrices_display=self.ids['matrices_display'],
             on_change_ic_method=self.on_change_ic_method
         )
-        self.ids['criterion_select'].update()
         if self.cli.ahp:
+            self.ids['criterion_select'].update(self.cli.selected_criterion.name)
             self.update_inconsistency()
         # Clock.schedule_once(lambda _: self.on_change_ahp(), 0.1)
 
@@ -55,21 +54,13 @@ class Controller(BoxLayout):
         self.update_inconsistency()
 
     def on_change_matrices(self):
-        self.ids['criterion_select'].update()
+        self.ids['criterion_select'].update(self.cli.selected_criterion.name)
         self.ids['matrices_display'].update()
         self.ids['control_panel'].update()
 
-    def on_edit_matrix(self):
-        """To resource hungry atm, most likely because of reading and parsing data from matrix labels"""
-        pass
-        # self.ids['control_panel'].setup_score_display()  # let the score table know how many rows to make
-        # self.ids['control_panel'].update()
-        # self.ids['control_panel'].save_matrix(None)  # None is the button instance, maybe will be removed
-        # self.update_inconsistency()
-
     def on_change_ahp(self):
         self.ids['matrices_display'].update()
-        self.ids['criterion_select'].update()
+        self.ids['criterion_select'].update(self.cli.selected_criterion.name)
         self.ids['control_panel'].setup_score_display()  # let the score table know how many rows to make
         self.ids['control_panel'].update()
         self.update_inconsistency()

@@ -15,11 +15,11 @@ class CriterionSelect(BoxLayout):
         self.cli = kwargs['cli']
         self.on_select_criterion = kwargs['on_select_criterion']
 
-    def update(self):
+    def update(self, selected_name):
         if self.cli.ahp:
             for node in [i for i in self.tv.iterate_all_nodes()]:
                 self.tv.remove_node(node)
-            CriterionSelect.populate_tree_view(self.tv, None, self.cli.ahp.root_criterion)
+            CriterionSelect.populate_tree_view(self.tv, None, self.cli.ahp.root_criterion, selected_name)
 
     def on_touch_down(self, touch):
         super().on_touch_down(touch)
@@ -28,7 +28,7 @@ class CriterionSelect(BoxLayout):
                 self.on_select_criterion(node.text)
 
     @staticmethod
-    def populate_tree_view(tree_view, parent, node):
+    def populate_tree_view(tree_view, parent, node, prev_selected_name):
         name = node.name
         if parent is None:
             tree_node = tree_view.add_node(TreeViewLabel(text=name,
@@ -36,6 +36,8 @@ class CriterionSelect(BoxLayout):
         else:
             tree_node = tree_view.add_node(TreeViewLabel(text=name,
                                                          is_open=True), parent)
+        if prev_selected_name == name:
+            tree_view.select_node(tree_node)  # keep the selection
         if not node.is_final_criterion:
             for child_node in node.children:
-                CriterionSelect.populate_tree_view(tree_view, tree_node, child_node)
+                CriterionSelect.populate_tree_view(tree_view, tree_node, child_node, prev_selected_name)

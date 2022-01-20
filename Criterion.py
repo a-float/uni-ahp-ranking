@@ -99,8 +99,8 @@ class Criterion(Node):
         self.matrices_completion[idx] = is_complete
         # always aggregate after setting is_aggregated to False
         # a bit slower, but the aggregated matrix is always updated
-        # mainly ull for the GUI
-        log.info(f"Matrix {idx + 1} set")
+        # easier for the GUI
+        log.info(f"Matrix {idx + 1} for {self.name} set")
         self.is_aggregated = False
         self.aggregate()
 
@@ -471,8 +471,22 @@ class Criterion(Node):
         if not self.parent:
             print("Can not remove the root criterion")
             return
+        # update the etree
+        # remove the criterion node
+        thisNode = self.tree_root.find(f".//criterion[@name='{self.name}']")
+        parentNode = self.tree_root.find(f".//criterion[@name='{self.parent.name}']")
+        parentNode.remove(thisNode)
+        # remove all data matrices for this criterion
+        data_node = self.tree_root.find(f"data")
+        old_matrices = data_node.findall(f"./matrix[@for='{self.name}']")
+        for matrix in old_matrices:
+            data_node.remove(matrix)
+
+        # update the criterion tree
         self.parent.children.remove(self)
         if not self.parent.children:
+            for child in self.children:
+                child.remove()
             self.parent.children = self.children  # pass the list of alternatives
             self.parent.is_final_criterion = True
         self.parent.clear()

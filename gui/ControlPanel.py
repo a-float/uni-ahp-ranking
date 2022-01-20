@@ -95,11 +95,17 @@ class ControlPanel(BoxLayout):
         if not split:
             log.error("Invalid goal name")
             return
-        goal_name = ' '.join(split).encode(encoding='ascii', errors="replace").decode()   # remove non ascii characters
+        goal_name = ' '.join(split).encode(encoding='ascii', errors="replace").decode()  # remove non ascii characters
         filename = '_'.join(split) + ".xml"
         Path("./xmls/").mkdir(parents=True, exist_ok=True)
         if Path('./xmls/' + filename).exists():
             log.error(f"File {filename} already exists in the xml directory")
+            return
+        try:
+            with open('./xmls/' + filename, 'w') as f:
+                pass
+        except:
+            log.error("Could not create file ./xmls/" + filename)
             return
         with open('./xmls/' + filename, 'w') as f:
             f.writelines(['<?xml version="1.0" encoding="UTF-8"?>\n',
@@ -169,7 +175,8 @@ class ControlPanel(BoxLayout):
         self.on_change_ic_method = kwargs.pop('on_change_ic_method')
         self.fileChoosePopup = ChooseFilePopup()
         self.fileChoosePopup.on_choose = self.load_ahp
-        self.rankingNameInputPopup = TextInputPopup(label_text="Choose new ranking's filename:", on_choose=self.create_ahp)
+        self.rankingNameInputPopup = TextInputPopup(label_text="Choose new ranking's filename:",
+                                                    on_choose=self.create_ahp)
         self.addAlternativePopup = TextInputPopup(label_text="What is the new alternatives name?",
                                                   on_choose=self.modify_alternatives)
         self.removeAlternativePopup = TextInputPopup(
@@ -243,7 +250,6 @@ class ControlPanel(BoxLayout):
     def apply_matrix(self, instance):
         curr_idx = self.matrices_display.current_tab._label.text  # get selected tab's name
         if curr_idx == 'A':
-            # TODO error?
             log.info("Can not modify the aggregated matrix")
             return
         matrix_editor = self.matrices_display.current_tab.content

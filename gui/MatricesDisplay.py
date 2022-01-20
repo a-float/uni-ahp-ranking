@@ -9,7 +9,6 @@ class MatricesDisplay(TabbedPanel):
         self.cli = None
 
     def setup(self, **kwargs):
-        self.on_matrix_edit = kwargs.pop('on_matrix_edit')
         self.cli = kwargs['cli']
 
     def update(self):  # TODO optimize update - cache matrix editors?
