@@ -1,3 +1,4 @@
+from kivy.clock import Clock
 from kivy.config import Config
 
 Config.set('graphics', 'width', '1200')
@@ -6,16 +7,14 @@ Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.write()
 
 import kivy
-from CLI import CLI
+from cli import CLI
 import os
-from Criterion import ic_complete_methods
+from ahp.criterion import ic_complete_methods
 
 kivy.require('2.0.0')
 
 from kivy.uix.boxlayout import BoxLayout
-from kivy.app import App
-from kivy.properties import ObjectProperty, StringProperty
-import gui  # needs to be there for kivy
+from kivy.properties import StringProperty
 import logging
 
 log = logging.getLogger('mylogger')
@@ -28,7 +27,9 @@ class Controller(BoxLayout):
         self.cli = CLI()
         self.ic_method = ic_complete_methods[0]
         super().__init__(**kwargs)
-        # self.cli.on_load("xmls/data_leaders.xml")
+        Clock.schedule_once(lambda x: self.setup(), 0.1)
+
+    def setup(self):
         self.ids['criterion_select'].setup(
             cli=self.cli,
             on_select_criterion=self.on_select
@@ -46,7 +47,6 @@ class Controller(BoxLayout):
         if self.cli.ahp:
             self.ids['criterion_select'].update(self.cli.selected_criterion.name)
             self.update_inconsistency()
-        # Clock.schedule_once(lambda _: self.on_change_ahp(), 0.1)
 
     def on_edit_criterion(self):
         self.ids['matrices_display'].update()
@@ -88,20 +88,3 @@ class Controller(BoxLayout):
             return
         self.inconsistency_text = f'Inconsistency = {"{:.5f}".format(ic)}\n\n'
         self.inconsistency_text += f'Inconsistency ratio = {"{:.5f}".format(icr)}'
-
-
-class MainApp(App):
-    kv_directory = "kvs"
-    title = "AHP Solicitor"
-
-    def build(self):
-        try:
-            os.mkdir("xmls")  # try to make a directory for rankings
-            log.info("Created xmls folder")
-        except:
-            pass
-        return Controller()
-
-
-if __name__ == '__main__':
-    MainApp().run()

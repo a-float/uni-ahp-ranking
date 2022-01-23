@@ -1,5 +1,5 @@
 from tabulate import tabulate
-from AHP import AHP
+from ahp.ahp import AHP
 
 
 def on_help(comm):
@@ -197,7 +197,6 @@ class CLI:
 
 def main():
     cli = CLI()
-    cli.on_load("xmls/data_phones.xml")  # TODO remove this line, it's just for easier debug
     cli.loop()
 
 

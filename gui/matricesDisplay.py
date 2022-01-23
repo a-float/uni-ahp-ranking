@@ -1,5 +1,5 @@
 from kivy.uix.tabbedpanel import TabbedPanelItem, TabbedPanel
-from gui.MatrixEditor import MatrixEditor
+from gui.matrixEditor import MatrixEditor
 
 
 class MatricesDisplay(TabbedPanel):

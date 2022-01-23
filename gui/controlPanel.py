@@ -4,7 +4,6 @@ from typing import Optional
 from pathlib import Path
 
 import numpy as np
-from kivy.properties import StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserListView
@@ -12,10 +11,10 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 
-from CLI import CLI
-from Criterion import calc_weight_methods, ic_complete_methods, ic_incomplete_methods
-from gui.MethodSelect import MethodSelect
-from gui.ScoreDisplay import ScoreDisplay
+from cli import CLI
+from ahp.criterion import calc_weight_methods, ic_complete_methods, ic_incomplete_methods
+from gui.methodSelect import MethodSelect
+from gui.scoreDisplay import ScoreDisplay
 
 log = logging.getLogger('mylogger')
 MAX_OUTPUT_HEIGHT = 20
@@ -99,7 +98,7 @@ class ControlPanel(BoxLayout):
         filename = '_'.join(split) + ".xml"
         Path("./xmls/").mkdir(parents=True, exist_ok=True)
         if Path('./xmls/' + filename).exists():
-            log.error(f"File {filename} already exists in the xml directory")
+            log.error(f"File '{filename}' already exists in the xml directory")
             return
         try:
             with open('./xmls/' + filename, 'w') as f:
@@ -240,11 +239,20 @@ class ControlPanel(BoxLayout):
         filename = os.path.basename(os.path.normpath(filename))
         filename = os.path.join("xmls", filename)
         self.cli.ahp.save_to_file(filename)
-        log.info(f"Ranking saved successfully to {filename}")
+        log.info(f"Ranking saved successfully to '{filename}'")
 
     def load_ahp(self):
         self.fileChoosePopup.dismiss()
-        self.cli.on_load(self.fileChoosePopup.ids['filechooser'].selection[0])
+        fc = self.fileChoosePopup.ids['filechooser']
+        if not fc.selection:
+            log.error("Loading unsuccessful - no file selected")
+            return
+        try:
+            self.cli.on_load(fc.selection[0])
+        except ValueError as e:
+            filename = os.path.basename(fc.selection[0])
+            log.error(f"Loading unsuccessful - invalid or corrupted ranking '{filename}'")
+            return
         self.on_change_ahp()
 
     def apply_matrix(self, instance):

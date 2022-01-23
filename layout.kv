@@ -24,10 +24,7 @@
         size: self.texture_size
 
 <MyButton>:
-#    size_hint: (None, None)
-#    text_size: self.width, None
     halign: 'center'
-#    height: '50dp'
 
 <MatricesDisplay>:
     do_default_tab: False
@@ -102,6 +99,7 @@
     orientation: "vertical"
 
 <Controller>:
+    id: controller
     canvas.before:
         Color:
             rgba: .1, .1, .1, 1
@@ -131,3 +129,6 @@
         size_hint_x: 0.8
         spacing: "15dp"
         padding: ["15dp", "36dp", "5dp", "15dp"]
+
+# root widget
+Controller
