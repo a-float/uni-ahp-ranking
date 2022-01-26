@@ -256,6 +256,9 @@ class ControlPanel(BoxLayout):
         self.on_change_ahp()
 
     def apply_matrix(self, instance):
+        if not self.cli.ahp:
+            log.error("No loaded ahp")
+            return
         curr_idx = self.matrices_display.current_tab._label.text  # get selected tab's name
         if curr_idx == 'A':
             log.info("Can not modify the aggregated matrix")
@@ -300,7 +303,10 @@ class ControlPanel(BoxLayout):
         else:
             log.info("No loaded ahp")
 
-    def reset_matrix(self, instance):  # TODO handle no loaded ahp in every method?
+    def reset_matrix(self, instance):
+        if not self.cli.ahp:
+            log.error("No ahp loaded")
+            return
         curr_idx = self.matrices_display.current_tab._label.text  # get selected tab's name
         if curr_idx == 'A':
             log.info("Can not reset the aggregated matrix")
