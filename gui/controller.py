@@ -80,6 +80,8 @@ class Controller(BoxLayout):
                 self.update_inconsistency()
 
     def update_inconsistency(self):
+        if not self.cli.ahp:
+            return
         ic, icr = self.cli.selected_criterion.ic(self.ic_method)
         if ic is None:
             log.error(f"Invalid method. Can not use {self.ic_method} with current matrices")

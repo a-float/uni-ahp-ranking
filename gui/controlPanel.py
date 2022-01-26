@@ -224,8 +224,9 @@ class ControlPanel(BoxLayout):
         self.add_widget(output)
 
     def on_change_calc_weight_method(self, new_method):
-        self.cli.ahp.set_all_calc_weight_method(new_method)
-        self.update()
+        if self.cli.ahp:
+            self.cli.ahp.set_all_calc_weight_method(new_method)
+            self.update()
 
     def save_all(self):
         if not self.cli.ahp:
