@@ -65,7 +65,7 @@ class Criterion(Node):
         return res
 
     def _update_weights(self):
-        weights = self.calculate_weights(self.matrix, self.is_complete)
+        weights = self.calculate_weights(self.matrix, self.is_complete())
         for i, w in enumerate(weights):
             self.children[i].set_weight(w)
 
@@ -99,8 +99,8 @@ class Criterion(Node):
         self.matrices_completion[idx] = is_complete
         # always aggregate after setting is_aggregated to False
         # a bit slower, but the aggregated matrix is always updated
-        # easier for the GUI
-        log.info(f"Matrix {idx + 1} for {self.name} set")
+        # mainly ull for the GUI
+        log.info(f"Matrix {idx + 1} set")
         self.is_aggregated = False
         self.aggregate()
 
@@ -284,6 +284,7 @@ class Criterion(Node):
                 sm = 0
                 for i in range(n):
                     for j in range(n):
+                        sm = 0
                         for k in range(n):
                             sm += self.matrix[k][j]
                         _C[i][j] = self.matrix[i][j] / sm
@@ -390,9 +391,9 @@ class Criterion(Node):
                     for j in range(0, y):
                         if matrix[i][j] == 0 and i != j:
                             B[i][j] = 0
-                        if matrix[i][j] != 0 and i != j:
+                        elif matrix[i][j] != 0 and i != j:
                             B[i][j] = matrix[i][j]
-                        if i == j:
+                        elif i == j:
                             B[i][j] = s[i]  # no need to add 1, because we initialized vector with ones ;)
                 # B*wmax = lambdamax*wmax
                 eigenvalues, eigenvector = map(np.real, np.linalg.eig(B))
@@ -404,15 +405,17 @@ class Criterion(Node):
                     for j in range(0, y):
                         if matrix[i][j] == 0 and i != j:
                             B[i][j] = 1
-                        if matrix[i][j] != 0 and i != j:
+                        elif matrix[i][j] != 0 and i != j:
                             B[i][j] = 0
-                        if i == j:
-                            B[i][j] = x - s[i] + 1  # because we initialized with zeroes
-                r = np.zeros((x, 1), dtype=np.float64)
+                        elif i == j:
+                            B[i][j] = x - s[i] + 1
+                r = np.ones((x, 1), dtype=np.float64)
                 for i in range(0, x):
                     for j in range(0, y):
                         if matrix[i][j] != 0:
-                            r[i] = math.log(matrix[i][j])
+                            r[i] *= matrix[i][j]
+                for i in range(0, x):
+                    r[i] = np.log(r[i])
                 B_inv = np.linalg.inv(B)
                 w_log = B_inv.dot(r)
                 w = np.zeros((x, 1), dtype=np.float64)
@@ -471,22 +474,8 @@ class Criterion(Node):
         if not self.parent:
             print("Can not remove the root criterion")
             return
-        # update the etree
-        # remove the criterion node
-        thisNode = self.tree_root.find(f".//criterion[@name='{self.name}']")
-        parentNode = self.tree_root.find(f".//criterion[@name='{self.parent.name}']")
-        parentNode.remove(thisNode)
-        # remove all data matrices for this criterion
-        data_node = self.tree_root.find(f"data")
-        old_matrices = data_node.findall(f"./matrix[@for='{self.name}']")
-        for matrix in old_matrices:
-            data_node.remove(matrix)
-
-        # update the criterion tree
         self.parent.children.remove(self)
         if not self.parent.children:
-            for child in self.children:
-                child.remove()
             self.parent.children = self.children  # pass the list of alternatives
             self.parent.is_final_criterion = True
         self.parent.clear()
@@ -500,3 +489,4 @@ class Criterion(Node):
         self.matrices_completion.clear()
         self.reshape_main_matrix()
         self.aggregate()
+

@@ -1,0 +1,27 @@
+<root>
+	<criterion name="Goal" goal="GMM_TEST">"</criterion>
+	<alternatives>
+		<alternative name="A" />
+		<alternative name="B" />
+		<alternative name="C" />
+        <alternative name="D" />
+        <alternative name="E" />
+	</alternatives>
+	<data>
+		<matrix for="Goal" width="5" height="5">
+			<value x="1" y="0">0.666666666666666666666666666</value>
+			<value x="2" y="0">0</value>
+			<value x="3" y="0">0</value>
+
+            <value x="2" y="1">0</value>
+			<value x="3" y="1">1.75</value>
+            <value x="4" y="1">0</value>
+
+            <value x="3" y="2">0</value>
+            <value x="4" y="2">0.333333333333333333333333333333</value>
+
+            <value x="4" y="3">9</value>
+
+		</matrix>
+	</data>
+</root>

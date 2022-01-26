@@ -1,0 +1,22 @@
+<root>
+	<criterion name="Goal" goal="EVM_TEST">"</criterion>
+	<alternatives>
+		<alternative name="A" />
+		<alternative name="B" />
+		<alternative name="C" />
+		<alternative name="D" />
+	</alternatives>
+	<data>
+		<matrix for="Goal" width="4" height="4">
+			<value x="1" y="0">4</value>
+			<value x="2" y="0">0.33333333333333</value>
+			<value x="3" y="0">0.25</value>
+
+			<value x="2" y="1">0.25</value>
+			<value x="3" y="1">1</value>
+
+			<value x="3" y="2">0.25</value>
+
+		</matrix>
+	</data>
+</root>
